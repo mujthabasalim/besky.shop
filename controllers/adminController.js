@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const { generateToken } = require("../services/jwtService");
 const getPaginationData = require("../utils/pagination");
 
+// TODO: Login logics
 // Render Login Page
 exports.loadLogin = async (req, res) => {
   try {
@@ -37,7 +38,6 @@ exports.login = async (req, res) => {
 
     // Store the token and admin first name in cookies
     res.cookie("adminToken", adminToken, { httpOnly: true, secure: true }); // 1 day expiration
-    // res.cookie('adminFirstName', admin.firstName, { httpOnly: true, secure: true });
 
     res.redirect("/admin/dashboard");
     console.log("login success");
@@ -46,6 +46,7 @@ exports.login = async (req, res) => {
   }
 };
 
+// TODO: Dashboard logics
 // Render Admin Dashboard
 exports.loadDashboard = async (req, res) => {
   try {
@@ -55,6 +56,7 @@ exports.loadDashboard = async (req, res) => {
   }
 };
 
+// TODO: User management logics
 // Render user management
 exports.viewUsers = async (req, res) => {
   try {
@@ -107,7 +109,8 @@ exports.updateUserStatus = async (req, res) => {
   }
 };
 
-// Fetch and display all categories and subcategories
+// TODO: Category management logics
+// Fetch and display all categories
 exports.getAllCategories = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -198,23 +201,55 @@ exports.updateCategory = async (req, res) => {
       return res.status(404).send("Category not found");
     }
 
-    // Redirect or respond with success
-    res.redirect("/admin/categories"); // Adjust the redirect URL as needed
+    res.redirect("/admin/categories"); 
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
   }
 };
 
+// TODO: Product management logics
 // Display all products
-exports.getProducts = async (req, res) => {
+exports.getAllProducts = async (req, res) => {
   try {
-    // const products = await Product.find().populate('category')
-    // console.log(products);
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
 
-    res.render("admin/productManagement");
+    const populateOptions = [
+      { path: "parentCategory" },
+      {path: 'subcategory'},
+      {path: 'variants'}
+    ];
+    // Use the pagination utility function
+    const {data: products, pagination} = await getPaginationData(
+      Product,
+      page,
+      limit,
+      populateOptions
+    );
+
+    // Update the pagination URLs to reflect the correct route
+    pagination.prevPageUrl = pagination.prevPageUrl
+      ? `/admin/products?page=${pagination.prevPageUrl}`
+      : null;
+    pagination.nextPageUrl = pagination.nextPageUrl
+      ? `/admin/products?page=${pagination.nextPageUrl}`
+      : null;
+    
+    res.render("admin/productManagement", { products, pagination });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+  }
+};
+
+// Load add product form
+exports.loadAddForm = async (req, res) => {
+  try {
+    const categories = await Category.find({ parentCategory: null });
+    res.render("admin/addProduct", { categories });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
   }
 };
 
@@ -250,6 +285,7 @@ exports.addProduct = async (req, res) => {
       quantity,
       price,
       discountPrice,
+      description,
       colors,
       images,
     });
