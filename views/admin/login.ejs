@@ -1,0 +1,53 @@
+<%- include('../partials/authHeader') -%>
+<div class="container-fluid">
+  <div class="logo text-black">BE.SKY</div>
+  <div class="row h-100">
+    <div class="col-lg-7 image-section p-0 d-none d-lg-block">
+      <img src="/static/uploads/tech-daily-ztYmIQecyH4-unsplash.jpg" alt="login-banner">
+    </div>
+    <div class="col-lg-5 d-flex justify-content-center">
+      <div class="form-section">
+        <h2 class="fw-bold mb-0">Welcome</h2>
+        <p class="text-secondary">Please login here</p>
+        <br>
+        <% if (locals.message) {%>
+          <p>
+            <%= message %>
+          </p>
+          <% } %>
+          <% if (locals.errorMessage) {%>
+            <p class="error">
+              <%= errorMessage %>
+            </p>
+            <% } %>
+            <form id="loginForm" action="/admin/login" method="POST">
+              <div class="mb-3 position-relative">
+                <input type="email" class="form-control" id="email" name="email" placeholder=" " value="mujthabasalim98@gmail.com" required>
+                <label for="email" class="form-input">Email Address</label>
+              </div>
+              <div class="mb-3 position-relative">
+                <input type="password" class="form-control" id="password" name="password" placeholder=" " value="999Salim@" required>
+                <label for="password" class="form-input">Password</label>
+                <span class="input-group-text" onclick="togglePassword('password')">
+                  <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                </span>
+              </div>
+              
+              <div class="terms">
+                <div class="d-flex align-items-centere">
+                  <input type="checkbox" id="terms" name="terms" class="checkbox"/>
+                  <label for="terms" >Remember me</label>
+                </div>
+                <a href="/auth/forgot-password">Forgot password?</a>
+              </div>
+
+              <button type="submit" class="btn btn-dark mb-3">Login</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+<%- include('../partials/authFooter') -%>
+    

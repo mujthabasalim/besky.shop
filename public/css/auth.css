@@ -1,0 +1,199 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,300&display=swap");
+
+@font-face {
+  font-family: Logo-font;
+  src: url("/static/fonts/MontserratAlt1-Medium.woff2");
+}
+
+:root {
+  --16px: 1rem;
+  --14px: 0.875rem;
+  --12px: 0.75rem;
+  --20px: 1.25rem;
+  --24px: 1.5rem;
+  --32px: 2rem;
+  --40px: 2.5rem;
+  --10px: 0.625rem;
+  --8px: 0.5rem;
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Poppins, sans-serif;
+}
+
+p {
+  font-size: var(--14px);
+}
+.logo {
+  position: absolute;
+  left: var(--40px);
+  top: var(--40px);
+  font-family: Logo-font;
+  font-size: 2.25rem;
+}
+.container-fluid {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.image-section {
+  overflow: hidden;
+  max-height: 100vh;
+}
+
+.image-section img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.form-control {
+  min-width: 20rem;
+  height: 2.5rem;
+}
+
+.form-control:focus+label,
+.form-control:not(:placeholder-shown)+label {
+  transform: translateY(-18px);
+  font-size: var(--12px);
+  background-color: white;
+  padding: 0 5px;
+  color: #000000;
+}
+
+.form-control:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: #000000;
+}
+
+.form-input {
+  position: absolute;
+  pointer-events: none;
+  left: 10px;
+  top: 9px;
+  transition: 0.2s ease all;
+  background-color: transparent;
+  padding: 0 5px;
+  font-size: var(--14px);
+}
+
+.input-group-text {
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  border: none;
+  outline: none;
+  z-index: 10;
+}
+
+.error {
+  color: red;
+  font-size: var(--14px);
+}
+
+.btn-dark {
+  background-color: #000000;
+  border: none;
+  width: 100%;
+  padding: 9px;
+  font-size: var(--14px);
+}
+
+.btn-dark:hover {
+  background-color: #333333;
+}
+
+.btn-google {
+  color: rgb(0, 0, 0);
+  border: solid 1px;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.btn-google img {
+  width: 1.5rem;
+  margin-right: 10px;
+}
+
+.btn-google:hover {
+  background-color: #000000;
+  color: white;
+}
+
+.checkbox-custom input[type="checkbox"] {
+  accent-color: black;
+}
+
+.form-links {
+  margin-bottom: 1rem;
+  font-size: var(--14px);
+}
+
+.form-links a,
+.terms a {
+  color: #000000;
+  text-decoration: none;
+}
+
+.form-links a:hover,
+.terms a:hover {
+  text-decoration: underline;
+}
+
+.terms {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: var(--12px);
+}
+
+.checkbox {
+  accent-color: black;
+  margin-right: 0.25rem;
+  cursor: pointer;
+}
+
+.login-link {
+  display: flex;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+.login-link a {
+  color: #000000;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: #000000 !important;
+}

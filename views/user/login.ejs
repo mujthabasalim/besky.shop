@@ -1,0 +1,62 @@
+<%- include('../partials/authHeader') -%>
+<div class="container-fluid">
+  <div class="logo">BE.SKY</p></div>
+  <div class="row">
+    <div class="col-lg-7 image-section p-0 d-none d-lg-block">
+      <img src="/static/uploads/dom-hill-nimElTcTNyY-unsplash.jpg" alt="login-banner">
+    </div>
+    <div class="col-lg-5 d-flex justify-content-center">
+      <div class="form-section">
+        <h2 class="fw-bold mb-0">Welcome</h2>
+        <p class="text-secondary">Please login here</p>
+        <br>
+        <% if (locals.message) {%>
+          <p>
+            <%= message %>
+          </p>
+          <% } %>
+          <% if (locals.errorMessage) {%>
+            <p class="error">
+              <%= errorMessage %>
+            </p>
+            <% } %>
+            <form id="loginForm" action="/auth/login" method="POST">
+              <div class="mb-3 position-relative">
+                <input type="email" class="form-control" id="email" name="email" placeholder=" " required>
+                <label for="email" class="form-input">Email Address</label>
+              </div>
+              <div class="mb-3 position-relative">
+                <input type="password" class="form-control" id="password" name="password" placeholder=" " required>
+                <label for="password" class="form-input">Password</label>
+                <span class="input-group-text" onclick="togglePassword('password')">
+                  <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                </span>
+              </div>
+              
+              <div class="terms">
+                <div class="d-flex align-items-centere">
+                  <input type="checkbox" id="terms" name="terms" class="checkbox"/>
+                  <label for="terms" >Remember me</label>
+                </div>
+                <a href="/auth/forgot-password">Forgot password?</a>
+              </div>
+
+              <div class="form-links">
+              <button type="submit" class="btn btn-dark mb-3">Login</button>
+              <a href="/auth/google">
+                <button type="button" class="btn btn-google">
+                  <img src="/static/uploads/pngwing.com.png" alt="" class="google-logo"> Login with Google
+                </button>
+              </a>
+              <div class="login-link">
+                <a href="/auth/register"><P class="d-inline">Don't have an account? </P>Register</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+<%- include('../partials/authFooter') -%>
+    

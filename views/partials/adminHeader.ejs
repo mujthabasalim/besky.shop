@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- box icons   -->
+  <link href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/header.css">
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+
+<body>
+
+  <!-- Loading Animation Container -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay"></div>
+
+  <div id="content" style="display: none"></div>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" id="sidebarClose"></button>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="/admin/dashboard"><i class='bx bx-grid-alt'></i> Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/users"><i class='bx bx-user'></i> Users</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/categories"><i class='bx bx-category'></i> Categories</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/products"><i class='bx bx-box'></i> Products</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/orders"><i class='bx bx-cart'></i> Orders</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/coupons"><i class='bx bxs-coupon'></i> Coupons</a>
+      </li>
+      <a href="/admin/offers"><i class='bx bx-gift'></i> Offers</a>
+      <li class="nav-item">
+        <a href="/admin/settings"><i class='bx bx-cog'></i> Settings</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar shadow-sm navbar-expand-lg navbar-light bg-white">
+    <div class="container-fluid position-relative">
+      <button class="navbar-toggler" type="button" id="sidebarToggle">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#">BE.SKY</a>
+      <div class="collapse navbar-collapse justify-content-center" id="navbarNav"></div>
+      <div class="icon-links d-none d-lg-flex">
+        <a class="nav-link" href="#"><i class="bi bi-search"></i></a>
+        <a class="nav-link" href="#"><i class="bi bi-heart"></i></a>
+        <a class="nav-link" href="#"><i class="bi bi-cart"></i></a>
+      </div>
+
+      <div class="dropdown">
+        <a class="btn border-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class='bx bx-user profile'></i>
+        </a>
+        <ul class="dropdown-menu shadow dropdown-menu-end" style="border-radius: 0; border: none;">
+          <li><a class="dropdown-item" href="#">
+              <div class="d-flex gap-2 align-item-center">
+                <i class="bi bi-person-gear profile-links"></i>
+                <p style="margin-bottom: 0; padding-top: 6px;">Profile</p>
+              </div>
+            </a></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item" href="#">
+              <div class="d-flex gap-2 align-item-center">
+                <i class="bi bi-gear profile-links"></i>
+                <p style="margin-bottom: 0; padding-top: 6px;">Settings</p>
+              </div>
+            </a></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item" href="/admin/logout">
+              <div class="d-flex gap-2 align-item-center">
+                <i class="bi bi-box-arrow-right profile-links"></i>
+                <p style="margin-bottom: 0; padding-top: 6px;">Logout</p>
+              </div>
+            </a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+<!-- side bar -->
+<div class="sidebar shadow-sm d-none d-lg-block pt-3">
+  <div class="d-flex gap-2 pb-3 ps-4 admin-welcome">
+      <img src="https://via.placeholder.com/50" class="rounded-circle" alt="Admin">
+      <div>
+        <h5 class="m-0">Hello 👋</h5>
+        <p class="text-muted m-0">Admin</p>
+      </div>
+  </div>
+  <a id="dashboard-link" href="/admin/dashboard"><i class='bx bx-grid-alt'></i> Dashboard</a>
+  <a id="users-link" href="/admin/users"><i class='bx bx-user'></i> User Management</a>
+  <a id="categories-link" href="/admin/categories"><i class='bx bx-category'></i> Category Management</a>
+  <a id="products-link" href="/admin/products"><i class='bx bx-box'></i> Product Management</a>
+  <a id="orders-link" href="#"><i class='bx bx-cart'></i> Order Management</a>
+  <a id="coupons-link" href="#"><i class='bx bxs-coupon'></i> Coupon Management</a>
+  <a id="offers-link" href="#"><i class='bx bx-gift'></i> Offer Management</a>
+  <a id="settings-link" href="#"><i class='bx bx-cog'></i> Settings</a>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Get all sidebar links
+      const sidebarLinks = document.querySelectorAll('.sidebar a');
+      
+      // Remove active class from all links and add to the clicked one
+      sidebarLinks.forEach(link => {
+          link.addEventListener('click', function() {
+              sidebarLinks.forEach(link => link.classList.remove('active'));
+              this.classList.add('active');
+          });
+      });
+
+      // Optionally: set the active link based on the current page URL
+      const currentUrl = window.location.pathname;
+      sidebarLinks.forEach(link => {
+          if (link.getAttribute('href') === currentUrl) {
+              link.classList.add('active');
+          }
+      });
+  });
+</script>

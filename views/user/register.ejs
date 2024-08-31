@@ -1,0 +1,83 @@
+<%- include('../partials/authHeader') -%>
+  <div class="container-fluid">
+    <div class="logo">BE.SKY</p></div>
+    <div class="row">
+      <div class="col-lg-7 image-section p-0 d-none d-lg-block">
+        <img src="/static/uploads/tu-tu-QZGQO3NvsLo-unsplash (1).jpg" />
+      </div>
+      <div class="col-lg-5 d-flex justify-content-center">
+        <div class="form-section">
+          <h2 class="fw-bold mb-0">Register</h2>
+          <p class="text-secondary">Create your account</p>
+          <br />
+          <% if (locals.message) {%>
+            <p>
+              <%= message %>
+            </p>
+            <% } %>
+              <% if (locals.errorMessage) {%>
+                <p class="error">
+                  <%= errorMessage %>
+                </p>
+                <% } %>
+                  <form id="registerForm" onsubmit="return validateForm()" action="/auth/register" method="POST">
+                    <div class="mb-3 position-relative">
+                      <input type="text" class="form-control" id="firstName" name="firstName" placeholder=" "
+                        required />
+                      <label for="firstName" class="form-input">First Name</label>
+                      <div id="firstNameError" class="error"></div>
+                    </div>
+                    <div class="mb-3 position-relative">
+                      <input type="text" class="form-control" id="lastName" name="lastName" placeholder=" " required />
+                      <label for="lastName" class="form-input">Last Name</label>
+                      <div id="lastNameError" class="error"></div>
+                    </div>
+                    <div class="mb-3 position-relative">
+                      <input type="email" class="form-control" id="email" name="email" placeholder=" " required />
+                      <label for="email" class="form-input">Email Address</label>
+                      <div id="emailError" class="error"></div>
+                    </div>
+                    <div class="mb-3 position-relative">
+                      <input type="password" class="form-control" id="password" name="password" placeholder=" "
+                        required />
+                      <label for="password" class="form-input">Password</label>
+                      <span class="input-group-text" onclick="togglePassword('password')">
+                        <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                      </span>
+                      <div id="passwordError" class="error"></div>
+                    </div>
+                    <div class="mb-3 position-relative">
+                      <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                        placeholder=" " required />
+                      <label for="confirmPassword" class="form-input">Confirm Password</label>
+                      <span class="input-group-text" onclick="togglePassword('confirmPassword')">
+                        <i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon"></i>
+                      </span>
+                      <div id="confirmPasswordError" class="error"></div>
+                    </div>
+                    <div class="terms">
+                      <div class="d-flex align-items-centere">
+                        <input type="checkbox" id="terms" name="terms" class="checkbox"/>
+                        <label for="terms" >I agree to the Terms and Conditions</label>
+                      </div>
+                    </div>
+                    <button type="submit" class="btn btn-dark mb-3">
+                      Send OTP
+                    </button>
+                    <a href="/auth/google">
+                      <button type="button" class="btn btn-google">
+                        <img src="/static/uploads/pngwing.com.png" alt="" class="google-logo" />
+                        Register with Google
+                      </button>
+                    </a>
+                    <div class="login-link">
+                      <a href="/auth/login">
+                        <P class="d-inline">Already have an account? </P>Login
+                      </a>
+                    </div>
+                  </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <%- include('../partials/authFooter') -%>

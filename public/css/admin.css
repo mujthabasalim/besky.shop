@@ -1,0 +1,43 @@
+.pagination .page-item .page-link {
+  border-radius: 5px;
+}
+
+/* TODO: Category management */
+/* ////////////////////////////////// */
+
+.filter-dropdown {
+  display: none;
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.filter-button:hover+.filter-dropdown,
+.filter-dropdown:hover {
+  display: block;
+}
+
+.filter-dropdown select,
+.filter-dropdown button {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* Style input fields with black border */
+.modal-body .form-control {
+  border: 1px solid black;
+}
+
+/* Style labels with font size 12px */
+.modal-body .form-label {
+  font-size: 12px;
+  margin: 0;
+}
+
+.modal-body .form-select {
+  border: 1px solid black;
+  transition: background-color 0.2s ease;
+}
