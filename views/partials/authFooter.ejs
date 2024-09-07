@@ -1,48 +1,50 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/public/js/validator.js"></script>
+
 <script>
-    function togglePassword(id) {
-        const passwordField = document.getElementById(id);
-        const toggleIcon = passwordField.parentElement.querySelector('.input-group-text i');
+    // function togglePassword(id) {
+    //     const passwordField = document.getElementById(id);
+    //     const toggleIcon = passwordField.parentElement.querySelector('.input-group-text i');
 
-        if (passwordField.type === "password") {
-            passwordField.type = "text";
-            toggleIcon.classList.replace("bi-eye-slash", "bi-eye");
-        } else {
-            passwordField.type = "password";
-            toggleIcon.classList.replace("bi-eye", "bi-eye-slash");
-        }
-    }
+    //     if (passwordField.type === "password") {
+    //         passwordField.type = "text";
+    //         toggleIcon.classList.replace("bi-eye-slash", "bi-eye");
+    //     } else {
+    //         passwordField.type = "password";
+    //         toggleIcon.classList.replace("bi-eye", "bi-eye-slash");
+    //     }
+    // }
 
-    function validateForm() {
-        let isValid = true;
+    // function validateForm() {
+    //     let isValid = true;
 
-        const password = document.getElementById("password").value;
-        const confirmPassword =
-            document.getElementById("confirmPassword").value;
-        const passwordError = document.getElementById("passwordError");
-        const confirmPasswordError = document.getElementById(
-            "confirmPasswordError"
-        );
+    //     const password = document.getElementById("password").value;
+    //     const confirmPassword =
+    //         document.getElementById("confirmPassword").value;
+    //     const passwordError = document.getElementById("passwordError");
+    //     const confirmPasswordError = document.getElementById(
+    //         "confirmPasswordError"
+    //     );
 
-        const passwordPattern =
-            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    //     const passwordPattern =
+    //         /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-        passwordError.textContent = "";
-        confirmPasswordError.textContent = "";
+    //     passwordError.textContent = "";
+    //     confirmPasswordError.textContent = "";
 
-        if (!passwordPattern.test(password)) {
-            passwordError.textContent =
-                "Password must be at least 8 characters long and contain a mix of uppercase letters, lowercase letters, numbers, and special characters.";
-            isValid = false;
-        }
+    //     if (!passwordPattern.test(password)) {
+    //         passwordError.textContent =
+    //             "Password must be at least 8 characters long and contain a mix of uppercase letters, lowercase letters, numbers, and special characters.";
+    //         isValid = false;
+    //     }
 
-        if (password !== confirmPassword) {
-            confirmPasswordError.textContent = "Passwords do not match.";
-            isValid = false;
-        }
+    //     if (password !== confirmPassword) {
+    //         confirmPasswordError.textContent = "Passwords do not match.";
+    //         isValid = false;
+    //     }
 
-        return isValid;
-    }
+    //     return isValid;
+    // }
 </script>
 </body>
 

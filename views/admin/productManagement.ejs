@@ -1,37 +1,201 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include('../partials/adminHeader') -%>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
+<div class="content">
+  <div class="d-flex justify-content-between align-items-center heading">
+    <h2>Product Management</h2>
+  </div>
 
-<body>
-  <h1>Product Management</h1>
-    <form action="/admin/products/addProduct" method="POST" enctype="multipart/form-data">
-    <div class="mb-3">
-      <label for="productName" class="form-label">Product Name</label>
-      <input type="text" class="form-control" id="productName" name="name" required>
-      <label for="brandName" class="form-label">Brand</label>
-      <input type="text" class="form-control" id="brand" name="brand" required>
-      <label for="categoryName" class="form-label">Category</label>
-      <input type="text" class="form-control" id="brand" name="category" required>
-      <label for="categoryName" class="form-label">Subcategory</label>
-      <input type="text" class="form-control" id="brand" name="subcategory" required>
-      <label for="categoryName" class="form-label">Price</label>
-      <input type="text" class="form-control" id="brand" name="price" required>
-      <label for="categoryName" class="form-label">Quantity</label>
-      <input type="text" class="form-control" id="brand" name="quantity" required>
-      <label for="categoryName" class="form-label">Description</label>
-      <input type="text" class="form-control" id="brand" name="description" required>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+  <div class="card shadow-sm p-4">
+    <div class="d-flex justify-content-between mb-3">
+      <a href="/admin/add-product"
+        ><button class="btn btn-dark">+ Add new product</button></a
+      >
+      <div class="d-flex justify-content-end gap-3">
+        <button class="btn btn-light">
+          <i class="bx bx-filter-alt"></i> Filter
+        </button>
+        <input
+          type="text"
+          class="form-control w-50"
+          placeholder="Search products..."
+        />
       </div>
-  </form>
+    </div>
 
-</body>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Product Name</th>
+          <th scope="col">Category</th>
+          <th scope="col">Subcategory</th>
+          <th scope="col">Brand</th>
+          <th scope="col">Price</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tbody>
+          <% products.forEach((product, index) => { %>
+          <tr
+            class="align-middle table-row"
+            data-bs-toggle="modal"
+            data-bs-target="#variantModal"
+            data-index="<%= index %>"
+          >
+            <td class="text-start"><%= product.name %></td>
+            <td><%= product.parentCategory.name %></td>
+            <td><%= product.subCategory.name %></td>
+            <td><%= product.brand %></td>
+            <td>&#8377;<%= product.finalPrice.toFixed(2) %></td>
+            <td>
+              <a href="/admin/edit-product/<%= product._id %>">
+                <button class="btn btn-light btn-sm">
+                  <i class="bx bx-edit"></i> Edit
+                </button>
+              </a>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+    </table>
 
-</html>
+    <!-- pagination -->
+    <div class="d-flex justify-content-between align-items-center">
+      <p class="m-0">
+        Showing <%= pagination.start %> to <%= pagination.end %> of <%= pagination.total %> data
+      </p>
+      <nav aria-label="Page navigation">
+        <ul class="pagination mb-0 d-flex gap-2">
+          <li class="page-item">
+            <a
+              class="page-link <%= pagination.prevPageUrl ? 'bg-dark' : 'bg-light' %>"
+              href="<%= pagination.prevPageUrl || 'javascript:void(0);' %>"
+              aria-label="Previous"
+              <%= pagination.prevPageUrl ? '' : 'disabled' %>
+            >
+              <span aria-hidden="true">
+                <i class="bx bx-arrow-back <%= pagination.prevPageUrl ? 'text-white' : 'text-black' %>"></i>
+              </span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a
+              class="page-link <%= pagination.nextPageUrl ? 'bg-dark' : 'bg-light' %>"
+              href="<%= pagination.nextPageUrl || 'javascript:void(0);' %>"
+              aria-label="Next"
+              <%= pagination.nextPageUrl ? '' : 'disabled' %>
+            >
+              <span aria-hidden="true">
+                <i class="bx bx-arrow-back bx-rotate-180 <%= pagination.nextPageUrl ? 'text-white' : 'text-black' %>"></i>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+class="modal fade"
+id="variantModal"
+tabindex="-1"
+aria-labelledby="variantModalLabel"
+aria-hidden="true"
+>
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="variantModalLabel">Basic Details</h5>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="modal"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <div id="productDetails">
+        <!-- Product basic details will be loaded here -->
+      </div>
+      <hr />
+      <h5>Variants</h5>
+      <hr />
+      <div id="variantDetails">
+        <!-- Variant details will be loaded here -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-light"
+        data-bs-dismiss="modal"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+    <script>
+      // Product data for demonstration purposes
+      const products = <%- JSON.stringify(products) %>;
+
+      // Event listener for modal show
+      const variantModal = document.getElementById('variantModal');
+      variantModal.addEventListener('show.bs.modal', function (event) {
+          const button = event.relatedTarget; // Button that triggered the modal
+          const index = button.getAttribute('data-index'); // Extract info from data-* attributes
+          const product = products[index]; // Get product details
+
+          const productDetails = document.getElementById('productDetails');
+          const variantDetails = document.getElementById('variantDetails');
+
+          // Clear previous details
+          productDetails.innerHTML = '';
+          variantDetails.innerHTML = '';
+
+          // Populate product basic details
+          productDetails.innerHTML = `
+              <h6>Product Name: ${product.name}</h6>
+              <p>Brand: ${product.brand}</p>
+              <p>Description: ${product.description}</p>
+              <p>Category: ${product.parentCategory.name} / ${product.subCategory.name}</p>
+              <p>Price: &#8377;${product.price.toFixed(2)}</p>
+              <p>Discount: ${product.discount}%</p>
+              <p>Final Price: ${product.finalPrice.toFixed(2)}</p>
+              <p>Tags: ${product.attributes.join(', ')}</p>
+              <p>Status: ${product.isActive ? '<span class="text-success">Active</span>' : '<span class="text-danger">Inactive</span>'}</p>
+          `;
+
+          // Populate variant details
+          product.variants.forEach(variant => {
+              const variantBlock = document.createElement('div');
+              variantBlock.className = 'mb-3';
+
+              let variantImages = '';
+              variant.images.forEach(image => {
+                  variantImages += `<img src="${image.url}" alt="Variant Image" class="img-thumbnail me-2" style="width: 100px; height: 100px;">`;
+              });
+
+              variantBlock.innerHTML = `
+                  <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6>Color: ${variant.color}</h6>
+                        <div class="d-flex flex-column ">
+                            <div class="d-flex align-items-center flex-wrap gap-2 mb-3">Sizes & Stocks: ${variant.sizes.map(s => `<p class="py-1 px-2 m-0 border border-dark rounded bg-dark text-white">${s.size}</p> <p class="py-1 px-2 m-0 border border-dark rounded">${s.stock}</p> `).join(' ')}</div>
+                            <p>Status: ${variant.isActive ? '<span class="text-success">Active</span>' : '<span class="text-danger">Inactive</span>'}</p>
+                        </div>
+                          <div class="d-flex flex-wrap gap-3">${variantImages}</div>
+                      </div>
+                  </div>
+              `;
+
+              variantDetails.appendChild(variantBlock);
+          });
+      });
+    </script>
+
+<%- include('../partials/adminFooter') -%>

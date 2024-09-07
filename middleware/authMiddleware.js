@@ -34,6 +34,8 @@ exports.preventAuthAccess = (req, res, next) => {
   const token = req.cookies.token;
 
   if (token) {
+    console.log('token');
+    
     try {
       const decoded = verifyToken(token);
       req.user = decoded;
@@ -46,6 +48,11 @@ exports.preventAuthAccess = (req, res, next) => {
       console.error('Invalid token:', error);
       res.clearCookie('token');
     }
+  }
+
+  // Store the original URL to redirect back to after login
+  if (!req.session.returnTo) {
+    req.session.returnTo = req.get('Referrer') || '/';
   }
 
   next();
@@ -105,3 +112,7 @@ exports.preventAdminAuthAccess = (req, res, next) => {
   next();
 };
 
+exports.storeToken = (req, res, next) => {
+  res.locals.token = req.cookies.token || null;
+  next();
+}

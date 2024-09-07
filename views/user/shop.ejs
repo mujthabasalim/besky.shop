@@ -1,0 +1,440 @@
+<%- include('../partials/header') -%>
+
+  <style>
+    .filters {
+      max-width: 250px;
+      padding: 15px;
+      /* background: #fff; */
+    }
+
+    .filters .form-check-input {
+      margin-left: 0;
+    }
+
+    .filters h5 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+
+    /* Collapsible icons */
+    .filters .bx-chevron-down {
+      transition: transform 0.3s;
+    }
+
+    .filters .bx-chevron-down {
+      transform: rotate(-180deg);
+    }
+
+    .filters .collapsed .bx-chevron-down {
+      transform: rotate(0deg);
+    }
+
+    /* Responsive styles */
+    @media (max-width: 992px) {
+      .filters {
+        max-width: 100%;
+        padding: 15px;
+        /* background: #f8f9fa; */
+        /* background: #f8f9fa; */
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+      }
+    }
+
+    /* Mobile view */
+    @media (max-width: 576px) {
+      .filters {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 50px;
+        z-index: 1050;
+        /* background: #fff; */
+        /* background: #fff; */
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+
+      .filters h5 {
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .filter-bottom-sheet {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #fff;
+        z-index: 1050;
+        padding: 15px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      .filter-bottom-sheet.active {
+        display: block;
+      }
+    }
+
+    /* Custom styles for color checkboxes */
+    .color-checkbox {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      border: 1px solid #ddd;
+      margin-right: 8px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .color-checkbox:checked::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: currentColor;
+      border-radius: 3px;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 992px) {
+      .filters {
+        max-width: 100%;
+        padding: 15px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+      }
+    }
+
+    .mobile-filter {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .modal.bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: 0;
+      max-height: 50%;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .modal-content {
+      border-radius: 0;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      height: 100%;
+      /* Ensure the content fills the modal */
+      overflow-y: auto;
+      /* Allow scrolling if content overflows */
+    }
+
+    /* Animation for sliding up */
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+
+      to {
+        transform: translateY(0);
+      }
+    }
+  </style>
+  </head>
+
+  <body>
+
+    <div class="container-fluid p-0 mobile-filter d-sm-none border-bottom mb-3">
+      <div class="sort border-end p-2" data-bs-toggle="modal" data-bs-target="#sortModal"><i class='bx bx-sort'></i>
+        Sort</div>
+      <div class="categories border-end p-2">Categories <i class='bx bx-chevron-down'></i></div>
+      <div class="gender border-end p-2">Gender <i class='bx bx-chevron-down'></i></div>
+      <div class="filter p-2"><i class='bx bx-filter'></i> Filter</div>
+    </div>
+
+    <!-- breadcrumbs -->
+    <div class="breadcrumbs">
+      <a href="/">Home</a> <span>&gt;</span>
+      <span>shop</span>
+  </div>
+
+    <div class="container-fluid mt-5">
+      <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3 mb-4 d-none d-sm-block filters">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <button id="resetFiltersBtn" class="btn btn-outline-secondary">Reset Filters</button>
+          </div>
+
+          <div class="border-bottom">
+            <a class="nav-link d-flex justify-content-between p-3 navlink" data-bs-toggle="collapse"
+              data-bs-target="#categoryCollapse" href="#categoryCollapse" role="button" aria-expanded="false"
+              aria-controls="categoryCollapse"><strong>Product Categories</strong>
+              <i class='bx bx-chevron-down'></i>
+            </a>
+            <div class="collapse mb-3" id="categoryCollapse">
+              <ul class="navbar-nav px-3 ms-2">
+                <% categories.forEach(category=> { %>
+                  <% if (!category.parentCategory) { %> <!-- Parent Category -->
+                    <li class="nav-item d-flex justify-content-between align-items-start">
+                      <div>
+                        <input class="form-check-input toggle-nested" type="checkbox" value="<%= category._id %>"
+                          id="<%= category.name %>Check">
+                        <label class="form-check-label" for="<%= category.name %>Check">
+                          <%= category.name %>
+                        </label>
+                        <ul class="list-unstyled collapse" id="<%= category.name %>Collapse">
+                          <% let foundSubcategories=false; categories.forEach(subcategory=> {
+                            %>
+                            <% if (subcategory.parentCategory &&
+                              String(subcategory.parentCategory._id)===String(category._id)) { %>
+                              <li class="ms-5">
+                                <a href="/shop?category=<%= subcategory._id %>" class="text-decoration-none text-dark">
+                                  <%= subcategory.name %>
+                                </a>
+                              </li>
+                              <% foundSubcategories=true; %>
+                                <% } %>
+                                  <% }) %>
+
+                                    <% if (!foundSubcategories) { %>
+                                      <li class="ms-4 text-muted">No subcategories available</li>
+                                      <% } %>
+                        </ul>
+                      </div>
+                    </li>
+                    <% } %>
+                      <% }) %>
+              </ul>
+            </div>
+          </div>
+
+
+          <form id="filterForm" method="GET" action="/shop">
+            <div class="border-bottom">
+              <a class="nav-link d-flex justify-content-between p-3 navlink" data-bs-toggle="collapse"
+                data-bs-target="#priceCollapse" href="#priceCollapse" role="button" aria-expanded="false"
+                aria-controls="priceCollapse"><strong>Filter by Price</strong>
+                <i class='bx bx-chevron-down'></i>
+              </a>
+              <div class="collapse mb-3" id="priceCollapse">
+                <ul class="navbar-nav px-3 ms-2">
+                  <li class="nav-item d-flex justify-content-between align-items-start">
+                    <div>
+                      <label for="priceRangeMin">Min Price:</label>
+                      <input type="range" class="form-range" name="minPrice" min="0" max="5000" step="20"
+                        id="priceRangeMin">
+                      <span id="minPriceLabel">₹0</span>
+
+                      <label for="priceRangeMax">Max Price:</label>
+                      <input type="range" class="form-range" name="maxPrice" min="0" max="5000" step="20"
+                        id="priceRangeMax">
+                      <span id="maxPriceLabel">₹5000</span>
+
+                      <p>Price: ₹<span id="minPriceText">0</span> - ₹<span id="maxPriceText">5000</span></p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="border-bottom">
+              <a class="nav-link d-flex justify-content-between p-3 navlink" data-bs-toggle="collapse"
+                data-bs-target="#colorCollapse" href="#colorCollapse" role="button" aria-expanded="false"
+                aria-controls="colorCollapse"><strong>Filter by Color</strong>
+                <i class='bx bx-chevron-down'></i>
+              </a>
+              <div class="collapse mb-3" id="colorCollapse">
+                <ul class="navbar-nav px-3 ms-2">
+                  <li>
+                    <div class="d-flex align-items-center gap-2">
+                      <input class="form-check-input" type="checkbox" name="color" value="red" id="colorRed">
+                      <label for="colorRed">Red</label>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="d-flex align-items-center gap-2">
+                      <input class="form-check-input" type="checkbox" name="color" value="blue" id="colorBlue">
+                      <label for="colorBlue">Blue</label>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="d-flex align-items-center gap-2">
+                      <input class="form-check-input" type="checkbox" name="color" value="Green" id="colorGreen">
+                      <label for="colorGreen">Green</label>
+                    </div>
+                  </li>
+                  <!-- Add more colors as needed -->
+                </ul>
+              </div>
+            </div>
+
+            <div class="border-bottom">
+              <a class="nav-link d-flex justify-content-between p-3 navlink" data-bs-toggle="collapse"
+                data-bs-target="#sizeCollapse" href="#sizeCollapse" role="button" aria-expanded="false"
+                aria-controls="sizeCollapse"><strong>Filter by Size</strong>
+                <i class='bx bx-chevron-down'></i>
+              </a>
+              <div class="collapse mb-3" id="sizeCollapse">
+                <ul class="navbar-nav px-3 ms-2">
+                  <li>
+                    <input class="form-check-input" type="checkbox" name="size" value="S" id="sizeSCheck">
+                    <label class="form-check-label" for="sizeSCheck">S</label>
+                  </li>
+                  <li>
+                    <input class="form-check-input" type="checkbox" name="size" value="L" id="sizeLCheck">
+                    <label class="form-check-label" for="sizeLCheck">L</label>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="col-lg-9">
+          <div class="row">
+            <% variants.forEach(({ variant,productId, productName, productBrand, productPrice, productFinalPrice })=> { %>
+              <div class="col-6 col-md-3 col-xl-2 mb-4">
+                <a href="/product/<%= variant._id %>" class="text-decoration-none text-dark">
+                <div class="card shadow-sm product-card">
+                  <i class="bi bi-heart"></i>
+                  <% if (variant.images.length> 0) { %>
+                    <img src="<%= variant.images[0].url %>" class="product-img card-img-top" alt="<%= productName %>">
+                    <% } %>
+                      <div class="card-body">
+                        <p class="card-title mb-1"><strong>
+                            <%= productBrand %>
+                          </strong></p>
+                        <p class="card-title mb-0">
+                          <%= productName %>
+                        </p>
+                        <p class="card-text m-0">&#8377;<%= productFinalPrice %> <del class="text-secondary ms-2">
+                              &#8377;<%= productPrice %></del></p>
+                      </div>
+                </div>
+              </a>
+              </div>
+              <% }) %>
+          </div>
+        </div>
+
+        <!-- Sort Modal -->
+        <div class="modal fade bottom-sheet" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="sortModalLabel">Sort</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <ul class="list-group">
+                  <li class="list-group-item">Relevance</li>
+                  <li class="list-group-item">New Arrivals</li>
+                  <li class="list-group-item">Price (High to Low)</li>
+                  <li class="list-group-item">Price (Low to High)</li>
+                  <li class="list-group-item">Ratings</li>
+                  <li class="list-group-item">Discount</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <%- include('../partials/footer') -%>
+          <!-- JavaScript for Mobile Filter Interaction -->
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+              // Toggle nested collapse based on checkbox state
+              document.querySelectorAll('.toggle-nested').forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                  const targetId = this.nextElementSibling.nextElementSibling.id; // Get the next collapse element ID
+                  const targetCollapse = document.getElementById(targetId);
+                  const collapseInstance = new bootstrap.Collapse(targetCollapse, {
+                    toggle: false
+                  });
+
+                  if (this.checked) {
+                    collapseInstance.show();
+                  } else {
+                    collapseInstance.hide();
+                  }
+                });
+              });
+
+              const filterForm = document.getElementById('filterForm');
+
+              // Function to handle filtering
+              const applyFilters = () => {
+                const formData = new FormData(filterForm);
+                const queryString = new URLSearchParams(formData).toString();
+
+                // Make an AJAX request to fetch filtered products
+                fetch(`/shop?${queryString}`, {
+                  headers: {
+                    'X-Requested-With': 'XMLHttpRequest' // Indicate it's an AJAX request
+                  }
+                })
+                  .then(response => response.text())
+                  .then(data => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const productsContainer = doc.querySelector('.row');
+                    document.querySelector('.row').innerHTML = productsContainer.innerHTML;
+                  })
+                  .catch(error => console.error('Error:', error));
+              };
+
+              // Add event listeners to all filter inputs
+              const filterInputs = filterForm.querySelectorAll('input');
+              filterInputs.forEach(input => {
+                input.addEventListener('change', applyFilters);
+              });
+            });
+
+            const priceRangeMin = document.getElementById('priceRangeMin');
+            const priceRangeMax = document.getElementById('priceRangeMax');
+            const minPriceText = document.getElementById('minPriceText');
+            const maxPriceText = document.getElementById('maxPriceText');
+
+            priceRangeMin.addEventListener('input', () => {
+              minPriceText.textContent = priceRangeMin.value;
+              applyFilters(); // Call the filter function on change
+            });
+
+            priceRangeMax.addEventListener('input', () => {
+              maxPriceText.textContent = priceRangeMax.value;
+              applyFilters(); // Call the filter function on change
+            });
+
+
+            document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+              // Clear all form inputs
+              filterForm.reset();
+
+              // Reset the price labels
+              minPriceText.textContent = '0';
+              maxPriceText.textContent = '5000';
+
+              // Optionally reset any URL parameters and reload the page without any filters
+              window.location.href = '/shop';
+            });
+          </script>

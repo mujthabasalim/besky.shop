@@ -1,0 +1,394 @@
+<%- include('../partials/header') -%>
+
+    <style>
+        .product-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #888;
+            margin-left: 10px;
+        }
+
+        .rating {
+            color: #FFD700;
+            font-size: 1.25rem;
+        }
+
+        .product-colors span {
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            border-radius: 5px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .product-colors span.red {
+            background-color: #ff4d4d;
+        }
+
+        .product-colors span.blue {
+            background-color: #4d79ff;
+        }
+
+        .product-colors span.orange {
+            background-color: #ffa64d;
+        }
+
+        .product-colors span.green {
+            background-color: #66cc66;
+        }
+
+        .product-colors span.black {
+            background-color: #333333;
+        }
+
+        .product-colors span.yellow {
+            background-color: #ffcc00;
+        }
+
+        .product-colors span.pink {
+            background-color: #ff58cd;
+        }
+
+        .product-size button {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-add-to-cart {
+            background-color: #000;
+            color: #fff;
+        }
+
+        .btn-add-to-cart:hover {
+            background-color: #444;
+        }
+
+        .product-images img {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .product-description {
+            margin-top: 30px;
+        }
+
+        .stock {
+    color: #1CD53E;
+    background-color: #1cd53e47;
+    padding: 2px 6px;
+    font-size: var(--12px);
+    border-radius: 5px;
+}
+
+.stock-out {
+    color: #DC3545;
+    background-color: #dc354660;
+    padding: 2px 6px;
+    font-size: var(--12px);
+    border-radius: 5px;
+}
+
+        #quantity-input {
+            max-width: 50px;
+            min-width: 30px;
+            padding: 0;
+            border: none;
+        }
+
+        .quantity-selector {
+            border: solid 1px;
+            border-radius: 5px;
+        }
+
+        .count-btn:focus {
+            border: none;
+        }
+
+        p {
+            font-size: var(--14px);
+            text-wrap: wrap;
+        }
+
+        .thumbnail-img {
+            border: 2px solid #f9f9f9;
+            transition: border-color 0.3s ease;
+        }
+
+        .thumbnail-img:hover {
+            border-color: #000;
+        }
+
+        /* Ensure that thumbnails take proper size on large screens */
+        .thumbnail-img {
+            width: 100%;
+            max-width: 80px;
+            object-fit: cover;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .flex-column-reverse {
+            flex-direction: column-reverse;
+        }
+
+        @media (min-width: 992px) {
+            .flex-lg-row {
+                flex-direction: row !important;
+            }
+        }
+
+        .breadcrumbs {
+            margin: 20px;
+        }
+
+        .breadcrumbs a,
+        .breadcrumbs span {
+            text-decoration: none;
+            font-size: var(--12px);
+            color: #000000;
+        }
+
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumbs span {
+            margin: 0 5px;
+        }
+
+        .rating {
+            display: flex;
+            font-size: 1.5rem;
+            /* Adjust size as needed */
+        }
+
+        .star-filled {
+            color: #FFD700;
+            /* Gold color for filled stars */
+        }
+
+        .star-empty {
+            color: #dcdcdc;
+            /* Gray color for empty stars */
+        }
+
+
+        /* Style to handle zoom effect */
+.zoomable {
+    transition: transform 0.3s ease;
+    transform-origin: center center;
+}
+
+.main-image {
+    position: relative;
+    overflow: hidden; /* To prevent zooming beyond the container */
+    cursor: crosshair;
+}
+
+/* For controlling the zoom scaling */
+.zoomed {
+    transform: scale(1.6); /* 2x zoom, adjust as per your preference */
+     /* Change cursor to indicate zoom-out */
+}
+    </style>
+    </head>
+
+    <body>
+
+        <div class="breadcrumbs">
+            <a href="/">Home</a> <span>&gt;</span>
+            <a href="/shop">shop</a> <span>&gt;</span>
+            <span>
+                <%= product.name %>
+                    <%= variant.color %>
+            </span>
+        </div>
+        <div class="container my-5">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex flex-column-reverse flex-lg-row">
+                        <!-- Thumbnails -->
+                        <div class="thumbnails col-12 col-lg-3 mb-3 mb-lg-0 d-flex flex-lg-column justify-content-center">
+                            <% variant.images.forEach((image, index) => { %>
+                                <div class="thumbnail-wrapper col-3 col-lg-12 mb-2">
+                                    <img src="<%= image.url %>" alt="Thumbnail <%= index + 1 %>"
+                                        class="thumbnail-img img-fluid" style="cursor: pointer;"
+                                        onclick="updateMainImage('<%= encodeURIComponent(image.url) %>')">
+                                </div>
+                            <% }) %>
+                        </div>
+                
+                        <!-- Main Image (With Zoom Effect) -->
+                        <div class="main-image col-12 col-lg-9">
+                            <div class="product-images position-relative">
+                                <img id="mainImage" src="<%= variant.images[0].url %>" alt="Product Image"
+                                    class="img-fluid zoomable" onmousemove="zoomImage(event)" onmouseleave="resetZoom()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="product-title">
+                            <%= product.brand %>
+                        </h1>
+                        <p class="<%= stockStatus ? 'stock' : 'stock-out' %>">
+                            <%= stockStatus ? 'In stock' : 'Out of stock' %>
+                        </p>
+                    </div>
+                    <p>
+                        <%= product.name %>
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div class="rating">
+                            <% const rating=Math.floor(averageRating); %>
+                                <% const hasHalfStar=averageRating % 1 !==0; %>
+                                    <% const totalStars=5; %>
+
+                                        <% for (let i=1; i <=totalStars; i++) { %>
+                                            <span
+                                                class="<%= i <= rating ? 'star-filled' : 'star-empty' %>">&#9733;</span>
+                                            <% } %>
+                        </div>
+                        <p class="mb-0 ms-2">(<%= reviewCount %> Reviews)</p>
+                    </div>
+                    <div class="my-3">
+                        <span class="price">&#8377;<%= product.finalPrice.toFixed(2) %></span>
+                        <span class="original-price">&#8377;<%= product.price.toFixed(2) %></span>
+                    </div>
+                    <div class="product-colors my-3">
+                        <p>Colors</p>
+                        <% variants.forEach(variant=> { %>
+                            <a href="/product/<%= variant._id %>" class="text-decoration-none">
+                                <span class="<%= variant.color.toLowerCase() %>"></span>
+                            </a>
+                            <% }) %>
+                    </div>
+                    <div class="product-size my-3">
+                        <p>Size</p>
+                        <% variant.sizes.forEach(sizeAndStock=> { %>
+                            <button class="btn btn-outline-dark">
+                                <%= sizeAndStock.size %>
+                            </button>
+                            <% }) %>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex quantity-selector">
+                            <button class="btn count-btn" id="decrement-btn" type="button">-</button>
+                            <input type="text" id="quantity-input" value="1" class="form-control text-center" readonly>
+                            <button class="btn count-btn" id="increment-btn" type="button">+</button>
+                        </div>
+                        <button class="btn btn-add-to-cart px-3 ms-3">Add to cart</button>
+                        <button class="btn btn-outline-dark ms-3"><i class="bi bi-heart"></i></button>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="product-description mt-5">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab"
+                            data-bs-target="#description" type="button" role="tab" aria-controls="description"
+                            aria-selected="true">Description</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="additional-info-tab" data-bs-toggle="tab"
+                            data-bs-target="#additional-info" type="button" role="tab" aria-controls="additional-info"
+                            aria-selected="false">Additional Information</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
+                            type="button" role="tab" aria-controls="reviews" aria-selected="false">Reviews</button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3" id="myTabContent">
+                    <div class="tab-pane fade show active" id="description" role="tabpanel"
+                        aria-labelledby="description-tab">
+                        <p>
+                            <%= product.description %>
+                        </p>
+                    </div>
+                    <div class="tab-pane fade" id="additional-info" role="tabpanel"
+                        aria-labelledby="additional-info-tab">
+                        <p></p>
+                    </div>
+                    <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const quantityInput = document.getElementById('quantity-input');
+                const incrementBtn = document.getElementById('increment-btn');
+                const decrementBtn = document.getElementById('decrement-btn');
+
+                incrementBtn.addEventListener('click', function () {
+                    let currentValue = parseInt(quantityInput.value);
+                    quantityInput.value = currentValue + 1;
+                });
+
+                decrementBtn.addEventListener('click', function () {
+                    let currentValue = parseInt(quantityInput.value);
+                    if (currentValue > 1) {
+                        quantityInput.value = currentValue - 1;
+                    }
+                });
+                // Function to update the main image when clicking on a thumbnail
+            });
+            function updateMainImage(encodedUrl) {
+                const mainImage = document.getElementById('mainImage');
+                const decodedUrl = decodeURIComponent(encodedUrl);
+                mainImage.src = decodedUrl;
+            }
+
+
+            function zoomImage(event) {
+    const mainImage = document.getElementById('mainImage');
+    const rect = mainImage.getBoundingClientRect();
+
+    // Calculate the mouse position relative to the image
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // Apply the zoom effect
+    mainImage.classList.add('zoomed');
+
+    // Adjust the transform origin based on where the mouse is
+    const xPercent = (x / mainImage.width) * 100;
+    const yPercent = (y / mainImage.height) * 100;
+    mainImage.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+}
+
+function resetZoom() {
+    const mainImage = document.getElementById('mainImage');
+    mainImage.classList.remove('zoomed');
+    mainImage.style.transformOrigin = 'center center'; // Reset to center
+}
+        </script>
+
+
+
+
+        <%- include('../partials/footer') -%>

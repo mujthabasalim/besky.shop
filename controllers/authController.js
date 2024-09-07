@@ -80,7 +80,7 @@ exports.register = async (req, res) => {
     // Store user data in session
     req.session.user = { firstName, lastName, email, password: hashedPassword };
 
-    res.render('user/verifyOTP', { message: 'OTP sent to your email' });
+    res.render('user/verifyOTP', { message: `We have shared a OTP to your registered email address <br> <strong>${req.session.user.email}</strong>` });
   } catch (error) {
     console.error('Error during registration:', error);
     res.render('user/register', { errorMessage: 'Registration failed, please try again' });
@@ -89,6 +89,7 @@ exports.register = async (req, res) => {
 
 // Render OTP verification page
 exports.loadVerify = async (req, res) => {
+  
   try {
     res.render('user/verifyOTP');
   } catch (error) {
@@ -98,7 +99,8 @@ exports.loadVerify = async (req, res) => {
 
 // Verify OTP and create a new user
 exports.verifyOTP = async (req, res) => {
-  const { otp } = req.body;
+  const { otp1, otp2, otp3, otp4, otp5, otp6 } = req.body;
+  const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
 
   try {
     // Check if user data exists in session
@@ -182,8 +184,12 @@ exports.login = async (req, res) => {
     // Store the token in a cookie
     res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
 
-    // Redirect to home page
-    res.redirect('/');
+    // Redirect to the originally requested URL or home page
+    const returnTo = req.session.returnTo || '/';
+    delete req.session.returnTo; // Clear the session after using it
+    res.redirect(returnTo);
+    console.log(returnTo);
+    
   } catch (error) {
     console.error(error);
     res.render('user/login', { errorMessage: 'An error occurred' });
@@ -243,7 +249,9 @@ exports.loadResetPassword = async (req, res) => {
 
 // Verify OTP and reset password
 exports.resetPassword = async (req, res) => {
-  const { otp, newPassword } = req.body;
+  const { otp1, otp2, otp3, otp4, otp5, otp6, newPassword } = req.body;
+  const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
+
   const email = req.session.email;
 
   try {

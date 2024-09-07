@@ -1,9 +1,11 @@
 <%- include('../partials/authHeader') -%>
+
   <div class="container-fluid">
-    <div class="logo">BE.SKY</p></div>
+    <div class="logo text-white d-none d-lg-block">BE.SKY</p></div>
+  <div class="logo d-lg-none">BE.SKY</p></div>
     <div class="row">
       <div class="col-lg-7 image-section p-0 d-none d-lg-block">
-        <img src="/static/uploads/tu-tu-QZGQO3NvsLo-unsplash (1).jpg" />
+        <img src="/public/assets/raamin-ka-8J56bYMT3-Q-unsplash.jpg" />
       </div>
       <div class="col-lg-5 d-flex justify-content-center">
         <div class="form-section">
@@ -16,44 +18,44 @@
             </p>
             <% } %>
               <% if (locals.errorMessage) {%>
-                <p class="error">
+                <p class="error-message">
                   <%= errorMessage %>
                 </p>
                 <% } %>
-                  <form id="registerForm" onsubmit="return validateForm()" action="/auth/register" method="POST">
-                    <div class="mb-3 position-relative">
+                <form id="registerForm" action="/auth/register" method="POST" onsubmit="return validateForm()">
+                    <div class="mb-3 position-relative" style="max-width: 408px;">
                       <input type="text" class="form-control" id="firstName" name="firstName" placeholder=" "
-                        required />
+                       />
                       <label for="firstName" class="form-input">First Name</label>
-                      <div id="firstNameError" class="error"></div>
+                      <div id="firstNameError" class="error-message"></div>
                     </div>
                     <div class="mb-3 position-relative">
-                      <input type="text" class="form-control" id="lastName" name="lastName" placeholder=" " required />
+                      <input type="text" class="form-control" id="lastName" name="lastName" placeholder=" " />
                       <label for="lastName" class="form-input">Last Name</label>
-                      <div id="lastNameError" class="error"></div>
+                      <div id="lastNameError" class="error-message"></div>
                     </div>
                     <div class="mb-3 position-relative">
-                      <input type="email" class="form-control" id="email" name="email" placeholder=" " required />
+                      <input type="text" class="form-control" id="email" name="email" placeholder=" " />
                       <label for="email" class="form-input">Email Address</label>
-                      <div id="emailError" class="error"></div>
+                      <div id="emailError" class="error-message"></div>
                     </div>
                     <div class="mb-3 position-relative">
                       <input type="password" class="form-control" id="password" name="password" placeholder=" "
-                        required />
+                       />
                       <label for="password" class="form-input">Password</label>
                       <span class="input-group-text" onclick="togglePassword('password')">
                         <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
                       </span>
-                      <div id="passwordError" class="error"></div>
+                      <div id="passwordError" class="error-message"></div>
                     </div>
                     <div class="mb-3 position-relative">
                       <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
-                        placeholder=" " required />
+                        placeholder=" "  />
                       <label for="confirmPassword" class="form-input">Confirm Password</label>
                       <span class="input-group-text" onclick="togglePassword('confirmPassword')">
                         <i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon"></i>
                       </span>
-                      <div id="confirmPasswordError" class="error"></div>
+                      <div id="confirmPasswordError" class="error-message"></div>
                     </div>
                     <div class="terms">
                       <div class="d-flex align-items-centere">
@@ -66,7 +68,7 @@
                     </button>
                     <a href="/auth/google">
                       <button type="button" class="btn btn-google">
-                        <img src="/static/uploads/pngwing.com.png" alt="" class="google-logo" />
+                        <img src="/public/uploads/pngwing.com.png" alt="" class="google-logo" />
                         Register with Google
                       </button>
                     </a>
@@ -80,4 +82,5 @@
       </div>
     </div>
   </div>
+
   <%- include('../partials/authFooter') -%>

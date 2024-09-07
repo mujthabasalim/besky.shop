@@ -1,189 +1,182 @@
 <%- include('../partials/adminHeader') -%>
 
-  <div class="content">
-    <div class="d-flex justify-content-between align-items-center headding">
-      <h2>Category Management</h2>
+<div class="content">
+  <div class="d-flex justify-content-between align-items-center heading">
+    <h2>Category Management</h2>
+  </div>
+
+  <div class="card shadow-sm p-4">
+    <div class="d-flex justify-content-between mb-3 position-relative">
+      <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+        + Add new category
+      </button>
+      <div class="d-flex justify-content-end gap-3">
+        <button class="btn btn-light filter-button">
+          <i class="bx bx-filter-alt"></i> Filter
+        </button>
+        <div class="filter-dropdown">
+          <select class="form-select" id="parentCategoryFilter">
+            <option value="">All Parent Categories</option>
+            <% categories.forEach(category => { %>
+              <option value="<%= category._id %>" <%= parentCategoryFilter == category._id ? 'selected' : '' %> >
+                <%= category.name %>
+              </option>
+            <% }) %>
+          </select>
+          <select class="form-select" id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="Active" <%= statusFilter == 'Active' ? 'selected' : '' %>>Active</option>
+            <option value="Inactive" <%= statusFilter == 'Inactive' ? 'selected' : '' %>>Inactive</option>
+          </select>
+          <button class="btn btn-outline-dark w-100" onclick="applyFilters()">Apply</button>
+        </div>
+        <input type="text" class="form-control w-50" placeholder="Search Categories..." value="<%= searchQuery %>" />
+      </div>
     </div>
 
-    <div class="card shadow-sm p-4">
-      <div class="d-flex justify-content-between mb-3 position-relative">
-        <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-          + Add new category
-        </button>
-        <div class="d-flex justify-content-end gap-3">
-          <button class="btn btn-light filter-button">
-            <i class="bx bx-filter-alt"></i> Filter
-          </button>
-          <div class="filter-dropdown">
-            <select class="form-select" id="parentCategoryFilter">
-              <option value="">All Parent Categories</option>
-              <% categories.forEach(category=> { %>
-                <option value="<%= category._id %>" <%=parentCategoryFilter==category._id ? 'selected' : '' %> >
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Category Name</th>
+          <th scope="col">Parent Category</th>
+          <th scope="col">Status</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% categories.forEach(category => { %>
+          <tr class="align-middle" data-category-id="<%= category._id %>"
+            data-parent-category-id="<%= category.parentCategory ? category.parentCategory._id : '' %>">
+            <td class="category-name">
+              <%= category.name %>
+            </td>
+            <td>
+              <%= category.parentCategory ? category.parentCategory.name : '' %>
+            </td>
+            <td class="category-status">
+              <%= category.status %>
+            </td>
+            <td>
+              <button class="btn btn-light btn-sm edit-category-btn" data-bs-toggle="modal"
+                data-bs-target="#editCategoryModal">
+                <i class='bx bx-edit'></i> Edit
+              </button>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <!-- pagination -->
+    <div class="d-flex justify-content-between align-items-center">
+      <p class="m-0">
+        Showing <%= pagination.start %> to <%= pagination.end %> of <%= pagination.total %> data
+      </p>
+      <nav aria-label="Page navigation">
+        <ul class="pagination mb-0 d-flex gap-2">
+          <li class="page-item">
+            <a class="page-link <%= pagination.prevPageUrl ? 'bg-dark' : 'bg-light' %>"
+              href="<%= pagination.prevPageUrl || 'javascript:void(0);' %>" aria-label="Previous"
+              <%= pagination.prevPageUrl ? '' : 'disabled' %>
+              >
+              <span aria-hidden="true">
+                <i class="bx bx-arrow-back <%= pagination.prevPageUrl ? 'text-white' : 'text-black' %>"></i>
+              </span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link <%= pagination.nextPageUrl ? 'bg-dark' : 'bg-light' %>"
+              href="<%= pagination.nextPageUrl || 'javascript:void(0);' %>" aria-label="Next"
+              <%= pagination.nextPageUrl ? '' : 'disabled' %>
+              >
+              <span aria-hidden="true">
+                <i class="bx bx-arrow-back bx-rotate-180 <%= pagination.nextPageUrl ? 'text-white' : 'text-black' %>"></i>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/admin/add-category" method="POST" onsubmit="submitForm(event, this)">
+          <div class="mb-3">
+            <label for="categoryName" class="form-label">Category Name</label>
+            <input type="text" class="form-control" id="categoryName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="parentCategory" class="form-label">Parent Category</label>
+            <select class="form-select" id="parentCategory" name="parentCategory">
+              <option value="">None (Root Category)</option>
+              <% categories.filter(c => !c.parentCategory).forEach(category => { %>
+                <option value="<%= category._id %>">
                   <%= category.name %>
                 </option>
-                <% }) %>
+              <% }) %>
             </select>
-            <select class="form-select" id="statusFilter">
-              <option value="">All Statuses</option>
-              <option value="active" <%=statusFilter=='active' ? 'selected' : '' %>>Active</option>
-              <option value="inactive" <%=statusFilter=='inactive' ? 'selected' : '' %>>Inactive</option>
-            </select>
-            <button class="btn btn-outline-dark w-100" onclick="applyFilters()">Apply</button>
           </div>
-          <input type="text" class="form-control w-50" placeholder="Search Categories..." />
-        </div>
-      </div>
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Category Name</th>
-            <th scope="col">Parent category</th>
-            <th scope="col">Status</th>
-            <th scope="col">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% categories.forEach(category=> { %>
-            <tr class="align-middle" data-category-id="<%= category._id %>"
-              data-parent-category-id="<%= category.parentCategory ? category.parentCategory._id : '' %>">
-              <td class="category-name">
-                <%= category.name %>
-              </td>
-              <td>
-                <%= category.parentCategory ? category.parentCategory.name : '' %>
-              </td>
-              <td class="category-status">
-                <%= category.status %>
-              </td>
-              <td>
-                <button class="btn btn-light btn-sm edit-category-btn" data-bs-toggle="modal"
-                  data-bs-target="#editCategoryModal">
-                  <i class='bx bx-edit'></i> Edit
-                </button>
-              </td>
-            </tr>
-            <% }) %>
-        </tbody>
-      </table>
-
-      <!-- pagination -->
-      <div class="d-flex justify-content-between align-items-center">
-        <p class="m-0">
-          Showing <%= pagination.start %> to <%= pagination.end %> of <%= pagination.total %> data
-        </p>
-        <nav aria-label="Page navigation">
-          <ul class="pagination mb-0 d-flex gap-2">
-            <li class="page-item">
-              <a class="page-link <%= pagination.prevPageUrl ? 'bg-dark' : 'bg-light' %>"
-                href="<%= pagination.prevPageUrl || 'javascript:void(0);' %>" aria-label="Previous"
-                <%=pagination.prevPageUrl ? '' : 'disabled' %>
-                >
-                <span aria-hidden="true">
-                  <i class="bx bx-arrow-back <%= pagination.prevPageUrl ? 'text-white' : 'text-black' %>"></i>
-                </span>
-              </a>
-            </li>
-            <li class="page-item">
-              <a class="page-link <%= pagination.nextPageUrl ? 'bg-dark' : 'bg-light' %>"
-                href="<%= pagination.nextPageUrl || 'javascript:void(0);' %>" aria-label="Next"
-                <%=pagination.nextPageUrl ? '' : 'disabled' %>
-                >
-                <span aria-hidden="true">
-                  <i
-                    class="bx bx-arrow-back bx-rotate-180 <%= pagination.nextPageUrl ? 'text-white' : 'text-black' %>"></i>
-                </span>
-              </a>
-            </li>
-          </ul>
-        </nav>
+          <div class="modal-footer justify-content-start px-0">
+            <button type="button" class="btn btn-light ms-0" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-dark">Submit</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-  <!--  -->
+</div>
 
-
-  <!-- Add Category Modal -->
-  <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form action="/admin/add-category" method="POST" onsubmit="submitForm(event, this)">
-            <div class="mb-3">
-              <label for="categoryName" class="form-label">Category Name</label>
-              <input type="text" class="form-control" id="categoryName" name="name" required>
-            </div>
-            <div class="mb-3">
-              <label for="parentCategory" class="form-label">Parent Category</label>
-              <select class="form-select" id="parentCategory" name="parentCategory">
-                <option value="">None (Root Category)</option>
-                <% categories.filter(c=> !c.parentCategory).forEach(category => { %>
-                  <option value="<%= category._id %>">
-                    <%= category.name %>
-                  </option>
-                  <% }) %>
-              </select>
-            </div>
-            <div class="modal-footer justify-content-start px-0">
-              <button type="button" class="btn btn-light ms-0" data-bs-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-dark">Submit</button>
-            </div>
-          </form>
-        </div>
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editCategoryForm" method="POST" action="#" onsubmit="submitForm(event, this)">
+          <input type="hidden" id="editCategoryId" name="id">
+          <div class="mb-3">
+            <label for="editCategoryName" class="form-label">Category Name</label>
+            <input type="text" class="form-control" id="editCategoryName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="editCategoryParent" class="form-label">Parent Category</label>
+            <select class="form-select" id="editCategoryParent" name="parentCategory">
+              <option value="">None (Root Category)</option>
+              <% categories.filter(c => !c.parentCategory).forEach(parentCategory => { %>
+                <option value="<%= parentCategory._id %>">
+                  <%= parentCategory.name %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="editCategoryStatus" class="form-label">Status</label>
+            <select class="form-select" id="editCategoryStatus" name="status">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
 
 
-  <!-- Edit Category Modal -->
-  <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editCategoryForm" method="POST" action="#" onsubmit="submitForm(event, this)">
-            <input type="hidden" id="editCategoryId" name="id">
-            <div class="mb-3">
-              <label for="editCategoryName" class="form-label">Category Name</label>
-              <input type="text" class="form-control" id="editCategoryName" name="name" required>
-            </div>
-            <div class="mb-3">
-              <label for="editCategoryParent" class="form-label">Parent Category</label>
-              <select class="form-select" id="editCategoryParent" name="parentCategory">
-                <option value="">None (Root Category)</option>
-                <% categories.filter(c=> !c.parentCategory || c._id == currentCategoryParent).forEach(parentCategory =>
-                  { %>
-                  <option value="<%= parentCategory._id %>" <%=parentCategory._id==currentCategoryParent ? 'selected'
-                    : '' %>>
-                    <%= parentCategory.name %>
-                  </option>
-                  <% }) %>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="editCategoryStatus" class="form-label">Status</label>
-              <select class="form-select" id="editCategoryStatus" name="status">
-                <option value="Active" <%=currentCategoryStatus=='Active' ? 'selected' : '' %>>Active</option>
-                <option value="Inactive" <%=currentCategoryStatus=='Inactive' ? 'selected' : '' %>>Inactive</option>
-              </select>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-primary">Save Changes</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <%- include('../partials/adminFooter') -%>
+<%- include('../partials/adminFooter') -%>

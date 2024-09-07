@@ -1,9 +1,11 @@
 <%- include('../partials/authHeader') -%>
+
 <div class="container-fluid">
-  <div class="logo">BE.SKY</p></div>
+  <div class="logo text-white d-none d-lg-block">BE.SKY</p></div>
+  <div class="logo d-lg-none">BE.SKY</p></div>
   <div class="row">
     <div class="col-lg-7 image-section p-0 d-none d-lg-block">
-      <img src="/static/uploads/dom-hill-nimElTcTNyY-unsplash.jpg" alt="login-banner">
+      <img src="/public/assets/mahdi-bafande-HOTWXfbII6k-unsplash.jpg" alt="login-banner">
     </div>
     <div class="col-lg-5 d-flex justify-content-center">
       <div class="form-section">
@@ -15,22 +17,25 @@
             <%= message %>
           </p>
           <% } %>
-          <% if (locals.errorMessage) {%>
-            <p class="error">
-              <%= errorMessage %>
-            </p>
-            <% } %>
+            <% if (locals.errorMessage) {%>
+              <p class="error-message">
+                <%= errorMessage %>
+              </p>
+              <% } %>
+
             <form id="loginForm" action="/auth/login" method="POST">
               <div class="mb-3 position-relative">
-                <input type="email" class="form-control" id="email" name="email" placeholder=" " required>
+                <input type="text" class="form-control" id="email" name="email" placeholder=" ">
                 <label for="email" class="form-input">Email Address</label>
+                <div class="error-message" id="emailError"></div>
               </div>
               <div class="mb-3 position-relative">
-                <input type="password" class="form-control" id="password" name="password" placeholder=" " required>
+                <input type="password" class="form-control" id="password" name="password" placeholder=" ">
                 <label for="password" class="form-input">Password</label>
                 <span class="input-group-text" onclick="togglePassword('password')">
                   <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
                 </span>
+                <div class="error-message" id="passwordError"></div>
               </div>
               
               <div class="terms">
@@ -45,7 +50,7 @@
               <button type="submit" class="btn btn-dark mb-3">Login</button>
               <a href="/auth/google">
                 <button type="button" class="btn btn-google">
-                  <img src="/static/uploads/pngwing.com.png" alt="" class="google-logo"> Login with Google
+                  <img src="/public/uploads/pngwing.com.png" alt="" class="google-logo"> Login with Google
                 </button>
               </a>
               <div class="login-link">
@@ -56,6 +61,7 @@
         </div>
       </div>
     </div>
+
 
 
 <%- include('../partials/authFooter') -%>

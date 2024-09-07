@@ -1,6 +1,14 @@
 {
-  "cSpell.words": ["resave", "uuidv"],
+  "cSpell.words": [
+    "fieldname",
+    "resave",
+    "uuidv"
+  ],
   "vscode_vibrancy.opacity": 0.5,
   "vscode_vibrancy.type": "auto",
-  "liveServer.settings.port": 5501
+  "liveServer.settings.port": 5501,
+  "cSpell.ignoreWords": [
+    "UBAID",
+    "YASNA"
+  ]
 }

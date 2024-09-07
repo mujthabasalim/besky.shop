@@ -1,32 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include('../partials/authHeader') -%>
+  <style>
+    .otp-container input {
+      width: 45px;
+      height: 45px;
+      border-radius: 5px;
+      border: solid 1px #dddddd;
+      text-align: center;
+    }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>
-    <%= locals.title ? title: "Verify OTP" %>
-  </title>
-  <link rel="stylesheet" href="/static/css/styles.css">
-</head>
+    .otp-container input:focus,
+    .otp-container input:valid {
+      border: solid 1.7px #000;
+    }
 
-<body>
-  <h1>Verify OTP</h1>
-  <% if (locals.message) {%>
-    <p>
-      <%= message %>
-    </p>
-    <% } %>
-      <% if (locals.errorMessage) {%>
-        <p>
-          <%= errorMessage %>
-        </p>
-        <% } %>
-          <form action="/auth/verify-otp" method="POST">
-            <label for="otp">Enter OTP:</label>
-            <input type="text" id="otp" name="otp" required>
-            <button type="submit">Verify OTP</button>
-          </form>
-</body>
+    #resend-link {
+      font-size: var(--14px);
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+  </style>
 
-</html>
+  <div class="container-fluid">
+    <div class="logo">BE.SKY</p>
+    </div>
+    <div class="row">
+      <div class="col-lg-7 image-section p-0 d-none d-lg-block">
+        <img src="/public/assets/mohamad-khosravi-d54wbtjedog-unsplash.jpg" alt="login-banner">
+      </div>
+      <div class="col-lg-5 d-flex justify-content-center">
+        <div class="form-section">
+          <h4 class="fw-bold mb-0">Verify OTP</h4>
+          <% if (locals.message) {%>
+            <p class="text-secondary">
+              <%- message %>
+            </p>
+            <% } %>
+              <% if (locals.errorMessage) {%>
+                <p class="error">
+                  <%= errorMessage %>
+                </p>
+                <% } %>
+                  <br>
+                  <form id="verify-otp-form" action="/auth/verify-otp" method="POST">
+                    <div class="otp-container d-flex justify-content-between gap-2 mb-2">
+                      <input type="text" class="otp-input" maxlength="1" id="otp1" name="otp1" required>
+                      <input type="text" class="otp-input text-center" maxlength="1" id="otp2" name="otp2" required>
+                      <input type="text" class="otp-input" maxlength="1" id="otp3" name="otp3" required>
+                      <input type="text" class="otp-input" maxlength="1" id="otp4" name="otp4" required>
+                      <input type="text" class="otp-input" maxlength="1" id="otp5" name="otp5" required>
+                      <input type="text" class="otp-input" maxlength="1" id="otp6" name="otp6" required>
+                    </div>
+
+                    <div class="d-flex justify-content-between resend-container">
+                      <p class="text-secondary">
+                        Resend OTP in <span id="countdown">30</span> seconds
+                      </p>
+                      <a href="/auth/verify-otp" id="resend-link"
+                        class="text-muted text-decoration-none resend-link">Resend OTP</a>
+                    </div>
+                    <button type="submit" class="btn btn-dark mb-3">Verify OTP</button>
+                  </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // Move to next input after entering a number
+    const inputs = document.querySelectorAll('.otp-input');
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', (e) => {
+        if (input.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+    });
+
+    // Countdown for Resend OTP link activation
+    let countdown = 30;
+    const countdownElement = document.getElementById('countdown');
+    const resendLink = document.getElementById('resend-link');
+
+    const timer = setInterval(() => {
+      countdown--;
+      countdownElement.innerText = countdown;
+
+      if (countdown === 0) {
+        clearInterval(timer);
+        resendLink.style.pointerEvents = 'auto';
+        resendLink.style.cursor = 'pointer';
+        resendLink.classList.remove('text-muted');
+        resendLink.classList.add('text-dark');
+      }
+    }, 1000);
+  </script>
+
+  <%- include('../partials/authFooter') -%>

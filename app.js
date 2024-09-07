@@ -37,8 +37,8 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Load static assets
-app.use('/static', express.static(path.join(__dirname, './public')));
-app.use('/assets', express.static(path.join(__dirname, './public/assets')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
+// app.use('/assets', express.static(path.join(__dirname, './public/assets')));
 
 // Routes
 const authRoutes = require('./routes/authRoutes');

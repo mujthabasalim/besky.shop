@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: Logo-font;
-  src: url("/static/fonts/MontserratAlt1-Medium.woff2");
+  src: url("/public/fonts/MontserratAlt1-Medium.woff2");
 }
 
 :root {
@@ -99,7 +99,7 @@ p {
   cursor: pointer;
   position: absolute;
   right: 10px;
-  top: 50%;
+  top: 20px;
   transform: translateY(-50%);
   background-color: transparent;
   border: none;
@@ -196,4 +196,28 @@ input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 1000px white inset !important;
   box-shadow: 0 0 0 1000px white inset !important;
   -webkit-text-fill-color: #000000 !important;
+}
+
+
+
+
+/*  Validation error message */
+
+.required-star {
+  font-size: 0.875rem;
+  color: #DC3545;
+}
+
+.error-message {
+  color: #DC3545;
+  font-size: 0.75rem;
+}
+
+.is-invalid {
+  border-color: #DC3545;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+  box-shadow: none;
 }

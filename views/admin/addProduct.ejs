@@ -1,0 +1,136 @@
+<%- include('../partials/adminHeader') -%>
+
+    <div class="content">
+      <div class="d-flex justify-content-between align-items-center heading">
+        <h2>Add New Product</h2>
+      </div>
+      <form
+        id="productForm"
+        action="/admin/add-product"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <!-- Product Details -->
+        <div class="d-lg-flex justify-content-between gap-3">
+          <div class="w-100 mb-3">
+            <label for="name">Product Name<span class="required-star">*</span></label>
+              <input type="text" class="form-control" id="name" name="name" data-required="true" />
+              <div class="error-message" id="nameError"></div>
+          </div>
+          <div class="w-100 mb-3">
+            <label for="brand">Brand<span class="required-star">*</span></label>
+            <input type="text" class="form-control" id="brand" name="brand" data-required="true" />
+            <div class="error-message" id="brandError"></div>
+          </div>
+        </div>
+
+        <div class="d-lg-flex justify-content-between gap-3">
+          <div class="w-100 mb-3">
+            <label for="parentCategory">Category<span class="required-star">*</span></label>
+            <select class="form-select" id="parentCategory" name="parentCategory" data-required="true">
+              <option value="">Select Category</option>
+              <% categories.forEach(function(category) { %>
+              <option value="<%= category._id %>"><%= category.name %></option>
+              <% }); %>
+            </select>
+            <div class="error-message" id="parentCategoryError"></div>
+          </div>
+          <div class="w-100 mb-3">
+            <label for="subCategory">Subcategory<span class="required-star">*</span></label>
+            <select class="form-select" id="subCategory" name="subCategory" data-required="true">
+              <option value="">Select Subcategory</option>
+            </select>
+            <div class="error-message" id="subCategoryError"></div>
+          </div>
+        </div>
+
+        <div class="d-lg-flex justify-content-between gap-3">
+          <div class="w-100 mb-3">
+            <label for="price">Price<span class="required-star">*</span></label>
+            <input type="number" step="0.01" class="form-control" id="price" name="price" data-required="true" />
+            <div class="error-message" id="priceError"></div>
+          </div>
+          <div class="w-100 mb-3">
+            <label for="discount">Discount (%)</label>
+            <input type="number" step="0.01" class="form-control" id="discount" name="discount" value="0" />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="attributes">Attributes (comma separated)</label>
+          <input type="text" class="form-control" id="attributes" name="attributes" />
+        </div>
+
+        <div class="mb-3">
+          <label for="description">Description<span class="required-star">*</span></label>
+          <textarea class="form-control" id="description" name="description" rows="3" data-required="true"></textarea>
+          <div class="error-message" id="descriptionError"></div>
+        </div>
+
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="isActive" name="isActive" checked/>
+          <label class="form-check-label" for="isActive">Active</label>
+        </div>
+
+        <hr />
+
+        <!-- Variants Section -->
+        <h4>Variants</h4>
+        <div id="variantsContainer" data-initial-count= 0></div>
+        <button type="button" class="btn btn-outline-dark px-4 mb-2" id="addVariantBtn">Add Variant</button>
+
+        <hr />
+
+        <a href="/admin/products"
+          ><button type="button" class="btn btn-light px-5 mb-4">
+            Cancel
+          </button></a
+        >
+        <button type="submit" class="btn btn-dark px-5 mb-4 ms-2">
+          Submit
+        </button>
+      </form>
+    </div>
+
+    <!-- Modal for Image Cropping -->
+    <div
+      class="modal fade"
+      id="cropperModal"
+      tabindex="-1"
+      aria-labelledby="cropperModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog custom-md">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="img-container">
+              <img id="imageToCrop" src="" alt="Image to crop" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-dark" id="cropImageBtn">
+              Crop
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  
+<%- include('../partials/adminFooter') -%>

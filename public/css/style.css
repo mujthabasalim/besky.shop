@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: Logo-font;
-  src: url("/static/fonts/MontserratAlt1-Medium.woff2");
+  src: url("/public/fonts/MontserratAlt1-Medium.woff2");
 }
 
 :root {
@@ -20,6 +20,7 @@ body {
   font-family: Poppins, sans-serif;
 }
 
+/* TODO: Page loading styles */
 #loading {
   position: fixed;
   width: 100%;
@@ -51,26 +52,19 @@ body {
 
 
 
-
-
-
-
-
-
-
-
-.headding {
-  margin-bottom: 2.8rem;
+/* TODO: Error message styles */
+.required-star {
+  font-size: 0.875rem;
+  color: #DC3545;
 }
-/* admin content */
-.content {
-  margin-left: 300px;
-  margin-top: 4px;
-  padding: 20px;
+
+.error-message {
+  color: #DC3545;
+  font-size: 0.75rem;
 }
-@media (max-width: 991.98px) {
-            
-  .content {
-      margin-left: 0;
-  }
+.is-invalid {
+  border-color: #DC3545;
+}
+.form-control.is-invalid:focus {
+  box-shadow: none;
 }

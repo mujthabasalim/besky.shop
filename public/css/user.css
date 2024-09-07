@@ -1,0 +1,57 @@
+/* breadcrumbs */
+.breadcrumbs {
+  margin: 20px;
+}
+
+.breadcrumbs a,
+.breadcrumbs span {
+  text-decoration: none;
+  font-size: var(--12px);
+  color: #000000;
+}
+
+.breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbs span {
+  margin: 0 5px;
+}
+
+/* product card */
+
+.product-card {
+  position: relative;
+  transition: transform 0.3s ease;
+  border: none;
+  border-radius: 0;
+}
+
+.product-card:hover {
+  transform: translateY(-10px);
+}
+
+.product-card .bi-heart {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.product-img {
+  border-radius: 0;
+}
+
+
+.product-card p {
+  font-size: var(--12px);
+  text-wrap: nowrap;
+  contain: content;
+}
+
+
+
+
+
+
