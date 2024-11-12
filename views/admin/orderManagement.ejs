@@ -1,0 +1,270 @@
+<%- include('../partials/adminHeader') -%>
+
+<style>
+  /* Add some enhancements for the dropdowns */
+  .disabled-dropdown {
+    background-color: #e9ecef; /* Light gray background for disabled dropdown */
+    color: #6c757d;           /* Gray text color for disabled dropdown */
+    pointer-events: none;      /* Disable interaction for disabled dropdown */
+    opacity: 0.7;              /* Add transparency for a subtle disabled effect */
+  }
+
+  .status-dropdown {
+    border-radius: 5px;
+    padding: 2px 4px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    transition: background-color 0.3s ease;
+  }
+
+  .status-dropdown.cancelled,
+  .status-dropdown.returned,
+  .status-dropdown.delivered {
+    background-color: #e9ecef; /* Static disabled color */
+    color: #6c757d;
+  }
+
+  .status-dropdown.pending,
+  .status-dropdown.shipped {
+    background-color: #fff; /* Regular dropdown background */
+    color: #000;
+  }
+
+  .status-dropdown:hover:not(.disabled-dropdown) {
+    background-color: #f8f9fa;
+  }
+</style>
+
+<!-- status for dropdown -->
+<% const statuses = ['shipped', 'delivered', 'returned']; %>
+<!-- Function for capitalize first letter -->
+<% function capitalizeFirstLetter (string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+} %>
+
+<div class="content">
+  <div class="d-flex justify-content-between align-items-center heading">
+    <h2>Order Management</h2>
+  </div>
+
+  <div class="card shadow-sm p-4">
+    <div class="d-flex justify-content-between mb-3">
+      <strong>Orders</strong>
+      <%- include('../partials/_searchAndSort', {
+            search: search,
+            sort: sort,
+            filters: [
+              
+            ],
+            sortOptions: [
+              { label: 'Newest', value: '-createdAt' },
+              { label: 'Oldest', value: 'createdAt' },
+            ],
+            entityName: 'orders'
+      }) %>
+    </div>
+
+    <div id="ordersDataSection">
+    <div class="table-wrapper">
+    <table class="table text-center">
+      <thead>
+        <tr>
+          <th scope="col" class="text-start">Order ID</th>
+                <th scope="col">No. of Items</th>
+                <th scope="col">Payment Method</th>
+                <th scope="col">Payment Status</th>
+                <th scope="col">Discount</th>
+                <th scope="col">Grand Total</th>
+                <th scope="col">Order Date</th>
+                <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (orders.length > 0 ){ %>
+        <% orders.forEach((order, orderIndex) => { %>
+          <tr class="align-middle table-row cursor-pointer" data-order-index="<%= orderIndex %>" data-order-id="<%= order._id %>">
+            <td class="text-start"><%= order._id %></td>
+            <td><%= order.items.length %></td>
+            <td><%= capitalizeFirstLetter(order.paymentMethod) %></td>
+            <td><%= capitalizeFirstLetter(order.paymentStatus) %></td>
+            <td><%= order.couponDiscount %></td>
+            <td>&#8377;<%= order.grandTotal.toFixed(2) %></td>
+            <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+            <td>
+              <% if (order.orderStatus === 'cancelled') { %>
+                <select id="status" class="status-dropdown <%= order.orderStatus %>" disabled>
+                  <option value="cancelled" class="cancelled">Cancelled</option>
+                </select>
+                <% } else if (order.orderStatus === 'delivered') { %>
+                  <select id="status" class="status-dropdown <%= order.orderStatus %>" disabled>
+                    <option value="delivered" class="delivered">Delivered</option>
+                  </select>
+              <% } else { %>
+                <select id="status" class="status-dropdown <%= order.orderStatus %>" onchange="updateStatus(this)">
+                  <option value="<%= order.orderStatus %>" class="<%= order.orderStatus %>">
+                    <%= capitalizeFirstLetter(order.orderStatus) %>
+                  </option>
+                  <% statuses.forEach(status => { %>
+                    <% if (status !== order.orderStatus) { %>
+                      <option value="<%= status %>" class="<%= status %>">
+                        <%= capitalizeFirstLetter(status) %>
+                      </option>
+                    <% } %>
+                  <% }) %>
+                </select>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+        <% } else { %> 
+          <tr>
+            <td colspan="6">No orders found</td>
+          </tr>
+        <% } %>
+      </tbody>      
+    </table>
+    </div>
+    <%- orders.length > 0 ? include('../partials/_pagination', { pagination }): '' %>
+    </div>    
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="OrderModal" tabindex="-1" aria-labelledby="OrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="OrderModalLabel">Order Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="orderDetailsContent">
+          <!-- This content will be updated dynamically with order details -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<%- include('../partials/adminFooter') -%>
+
+<script>
+  // Define orders data
+  const orders = <%- JSON.stringify(orders) %>;
+
+  // Attach click event to each row
+  document.querySelectorAll('.table-row').forEach(row => {
+  row.addEventListener('click', function (event) {
+    // Check if the clicked element is a dropdown
+    if (event.target.tagName !== 'SELECT') {
+      const orderIndex = row.getAttribute('data-order-index'); // Get order index
+      const order = orders[orderIndex]; // Get order data
+
+      const orderDetailsContent = document.getElementById('orderDetailsContent');
+
+      // Start building the order details HTML content
+      let itemsHTML = '';
+
+      // Loop through the items in the order to construct the item details
+      order.items.forEach(item => {
+        itemsHTML += `
+          <div>
+            <p class="m-0"><strong>Product Name:</strong> ${item.name}</p>
+            <p class="m-0"><strong>Quantity:</strong> ${item.quantity}</p>
+            <p class="m-0"><strong>Original Price:</strong> ₹${item.originalPrice.toFixed(2)}</p>
+            <p class="m-0"><strong>Final:</strong> ₹${item.total.toFixed(2)}</p>
+            <p class="m-0"><strong>Size:</strong> ${item.size}</p>
+            <p class="m-0"><strong>Color:</strong> ${item.color}</p>
+          </div>
+          <hr />`; // Separating items with a horizontal line
+      });
+
+      // Set the full HTML content including the itemsHTML
+      orderDetailsContent.innerHTML = `
+        <h5>Order ID: ${order._id}</h5>
+        <p class="m-0"><strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
+        <hr />
+        <strong>Items in Order</strong>
+        ${itemsHTML}
+        <p class="m-0"><strong>Shipping Address:</strong> ${order.shippingAddress.houseName}, ${order.shippingAddress.area}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.postcode}</p>
+        <p class="m-0"><strong>Contact Number:</strong> ${order.shippingAddress.contactNo}</p>
+        <p class="m-0"><strong>Payment Method:</strong> ${capitalizeFirstLetter(order.paymentMethod)}</p>
+        <p class="m-0"><strong>Payment Status:</strong> ${capitalizeFirstLetter(order.paymentStatus)}</p>
+        <p class="m-0"><strong>Discount:</strong> ₹${order.couponDiscount.toFixed(2)}</p>
+        <p class="m-0"><strong>Grand Total:</strong> ₹${order.grandTotal.toFixed(2)}</p>
+        <p class="m-0"><strong>Order Status:</strong> ${capitalizeFirstLetter(order.orderStatus)}</p>
+      `;
+
+      // Show the modal
+      const orderModal = new bootstrap.Modal(document.getElementById('OrderModal'));
+      orderModal.show();
+    }
+  });
+});
+
+
+  // Function to handle status change and send to backend
+  function updateStatus(dropdown) {
+    const status = dropdown.value;
+    const row = dropdown.closest('.table-row');
+    const orderId = row.getAttribute('data-order-id');
+    const itemId = row.getAttribute('data-item-id');
+    
+    // Disable dropdown for certain statuses
+    if (status === 'cancelled' || status === 'returned' || status === 'delivered') {
+      dropdown.disabled = true;
+    }
+
+    // Change color based on selected option
+    dropdown.className = 'status-dropdown ' + status;
+
+    // Example of sending a request to the backend
+    fetch('/admin/order/updateStatus', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderId, itemId, status }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+
+      // Disable dropdown after successful status change (if needed)
+      if (status === 'cancelled' || status === 'returned' || status === 'delivered') {
+        dropdown.disabled = true;
+        dropdown.classList.add('disabled-dropdown'); // Add class for UI enhancement
+      }
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
+
+  // Function to initialize dropdowns and apply status-specific behavior
+  function initDropdowns() {
+    document.querySelectorAll('.status-dropdown').forEach(dropdown => {
+      const status = dropdown.value;
+
+      // Disable the dropdown and style it if the status is "cancelled", "returned", or "delivered"
+      if (status === 'cancelled' || status === 'returned' || status === 'delivered') {
+        dropdown.disabled = true;
+        dropdown.classList.add('disabled-dropdown');
+      }
+
+      // Attach the change event listener for dropdowns
+      dropdown.addEventListener('change', function() {
+        updateStatus(dropdown);
+      });
+    });
+  }
+
+  // Call the initialization function to set up dropdowns
+  initDropdowns();
+
+</script>
+

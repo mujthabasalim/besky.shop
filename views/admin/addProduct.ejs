@@ -51,14 +51,9 @@
             <div class="error-message" id="priceError"></div>
           </div>
           <div class="w-100 mb-3">
-            <label for="discount">Discount (%)</label>
-            <input type="number" step="0.01" class="form-control" id="discount" name="discount" value="0" />
+            <label for="attributes">Attributes (comma separated)</label>
+            <input type="text" class="form-control" id="attributes" name="attributes" />
           </div>
-        </div>
-
-        <div class="mb-3">
-          <label for="attributes">Attributes (comma separated)</label>
-          <input type="text" class="form-control" id="attributes" name="attributes" />
         </div>
 
         <div class="mb-3">
@@ -76,7 +71,7 @@
 
         <!-- Variants Section -->
         <h4>Variants</h4>
-        <div id="variantsContainer" data-initial-count= 0></div>
+        <div id="variantsContainer" data-initial-count= 0 ></div>
         <button type="button" class="btn btn-outline-dark px-4 mb-2" id="addVariantBtn">Add Variant</button>
 
         <hr />
@@ -132,5 +127,5 @@
       </div>
     </div>
 
-  
+  <script src="/public/js/product.js"></script>
 <%- include('../partials/adminFooter') -%>

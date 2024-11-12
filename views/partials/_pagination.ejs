@@ -1,0 +1,31 @@
+<div class="d-flex justify-content-between align-items-center">
+  <p class="m-0">
+    Showing <%= pagination.start %> to <%= pagination.end %> of <%= pagination.total %> data
+  </p>
+  <nav aria-label="Page navigation">
+    <ul class="pagination mb-0 d-flex gap-2">
+      <li class="page-item">
+        <button
+          class="page-link <%= pagination.prevPageUrl ? 'bg-dark' : 'bg-light' %>"
+          data-page="<%= pagination.currentPage - 1 %>"
+          <%= pagination.prevPageUrl ? '' : 'disabled' %>
+        >
+          <span aria-hidden="true">
+            <i class="bx bx-arrow-back <%= pagination.prevPageUrl ? 'text-white' : 'text-black' %>"></i>
+          </span>
+        </button>
+      </li>
+      <li class="page-item">
+        <button
+          class="page-link <%= pagination.nextPageUrl ? 'bg-dark' : 'bg-light' %>"
+          data-page="<%= pagination.currentPage + 1 %>"
+          <%= pagination.nextPageUrl ? '' : 'disabled' %>
+        >
+          <span aria-hidden="true">
+            <i class="bx bx-arrow-back bx-rotate-180 <%= pagination.nextPageUrl ? 'text-white' : 'text-black' %>"></i>
+          </span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>

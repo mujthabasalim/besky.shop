@@ -12,18 +12,17 @@
           <h2 class="fw-bold mb-0">Register</h2>
           <p class="text-secondary">Create your account</p>
           <br />
-          <% if (locals.message) {%>
-            <p>
-              <%= message %>
-            </p>
-            <% } %>
-              <% if (locals.errorMessage) {%>
-                <p class="error-message">
-                  <%= errorMessage %>
-                </p>
-                <% } %>
+          <!-- Display Success Flash Message -->
+          <% if (successMessage && successMessage.length > 0) { %>
+            <p class="text-success" id="success-message"><%- successMessage %></p>
+          <% } %>
+          
+          <!-- Display Error Flash Message -->
+          <% if (errorMessage && errorMessage.length > 0) { %>
+            <p class="error-message" id="error-message"><%- errorMessage %></p>
+          <% } %>
                 <form id="registerForm" action="/auth/register" method="POST" onsubmit="return validateForm()">
-                    <div class="mb-3 position-relative" style="max-width: 408px;">
+                    <div class="mb-3 position-relative">
                       <input type="text" class="form-control" id="firstName" name="firstName" placeholder=" "
                        />
                       <label for="firstName" class="form-input">First Name</label>
@@ -59,8 +58,8 @@
                     </div>
                     <div class="terms">
                       <div class="d-flex align-items-centere">
-                        <input type="checkbox" id="terms" name="terms" class="checkbox"/>
-                        <label for="terms" >I agree to the Terms and Conditions</label>
+                        <!-- <input type="checkbox" id="terms" name="terms" class="checkbox"/>
+                        <label for="terms" >I agree to the Terms and Conditions</label> -->
                       </div>
                     </div>
                     <button type="submit" class="btn btn-dark mb-3">

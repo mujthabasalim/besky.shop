@@ -1,89 +1,6 @@
 <%- include('../partials/header') -%>
 
   <style>
-    .filters {
-      max-width: 250px;
-      padding: 15px;
-      /* background: #fff; */
-    }
-
-    .filters .form-check-input {
-      margin-left: 0;
-    }
-
-    .filters h5 {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      margin-bottom: 1rem;
-    }
-
-    /* Collapsible icons */
-    .filters .bx-chevron-down {
-      transition: transform 0.3s;
-    }
-
-    .filters .bx-chevron-down {
-      transform: rotate(-180deg);
-    }
-
-    .filters .collapsed .bx-chevron-down {
-      transform: rotate(0deg);
-    }
-
-    /* Responsive styles */
-    @media (max-width: 992px) {
-      .filters {
-        max-width: 100%;
-        padding: 15px;
-        /* background: #f8f9fa; */
-        /* background: #f8f9fa; */
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-      }
-    }
-
-    /* Mobile view */
-    @media (max-width: 576px) {
-      .filters {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        height: 50px;
-        z-index: 1050;
-        /* background: #fff; */
-        /* background: #fff; */
-        border-bottom: 1px solid #ddd;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-      }
-
-      .filters h5 {
-        font-size: 14px;
-        margin: 0;
-      }
-
-      .filter-bottom-sheet {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: #fff;
-        z-index: 1050;
-        padding: 15px;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        display: none;
-      }
-
-      .filter-bottom-sheet.active {
-        display: block;
-      }
-    }
-
     /* Custom styles for color checkboxes */
     .color-checkbox {
       appearance: none;
@@ -107,334 +24,449 @@
       border-radius: 3px;
     }
 
-    /* Responsive styles */
-    @media (max-width: 992px) {
-      .filters {
-        max-width: 100%;
-        padding: 15px;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-      }
-    }
-
-    .mobile-filter {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .modal.bottom-sheet {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 0;
-      max-height: 50%;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      animation: slideUp 0.3s ease-out;
-    }
-
-    .modal-content {
+    select {
+      width: max-content;
+      border: none;
+      outline: none;
       border-radius: 0;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      height: 100%;
-      /* Ensure the content fills the modal */
-      overflow-y: auto;
-      /* Allow scrolling if content overflows */
+      padding: 2px;
+      font-size: 12px;
     }
 
-    /* Animation for sliding up */
-    @keyframes slideUp {
-      from {
-        transform: translateY(100%);
-      }
+    .accordion {
+      border: none;
+      border-radius: 0;
+    }
 
-      to {
-        transform: translateY(0);
-      }
+    .accordion-item {
+      border: none;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .accordion-button:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    .accordion-button:not(.collapsed) {
+      border-bottom: 1px solid #dee2e6;
+      background-color: #fff;
     }
   </style>
-  </head>
-
-  <body>
-
-    <div class="container-fluid p-0 mobile-filter d-sm-none border-bottom mb-3">
-      <div class="sort border-end p-2" data-bs-toggle="modal" data-bs-target="#sortModal"><i class='bx bx-sort'></i>
-        Sort</div>
-      <div class="categories border-end p-2">Categories <i class='bx bx-chevron-down'></i></div>
-      <div class="gender border-end p-2">Gender <i class='bx bx-chevron-down'></i></div>
-      <div class="filter p-2"><i class='bx bx-filter'></i> Filter</div>
-    </div>
-
-    <!-- breadcrumbs -->
-    <div class="breadcrumbs">
-      <a href="/">Home</a> <span>&gt;</span>
-      <span>shop</span>
+  <!-- breadcrumbs -->
+  <div class="breadcrumbs">
+    <a href="/">Home</a> <span>&gt;</span>
+    <span>shop</span>
   </div>
 
-    <div class="container-fluid mt-5">
-      <div class="row">
-        <!-- Filters Sidebar -->
-        <div class="col-lg-3 mb-4 d-none d-sm-block filters">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <button id="resetFiltersBtn" class="btn btn-outline-secondary">Reset Filters</button>
-          </div>
+  <div class="container-fluid mt-5">
+    <div class="row">
+      <!-- Filters Sidebar -->
+      <div class="col-lg-2 mb-2 d-none d-sm-block p-3 filters">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <a href="/shop" id="resetFiltersBtn" class="btn btn-outline-secondary">Reset Filters</a>
+        </div>
 
-          <div class="border-bottom">
-            <a class="nav-link d-flex justify-content-between p-3 navlink" data-bs-toggle="collapse"
-              data-bs-target="#categoryCollapse" href="#categoryCollapse" role="button" aria-expanded="false"
-              aria-controls="categoryCollapse"><strong>Product Categories</strong>
-              <i class='bx bx-chevron-down'></i>
-            </a>
-            <div class="collapse mb-3" id="categoryCollapse">
-              <ul class="navbar-nav px-3 ms-2">
-                <% categories.forEach(category=> { %>
-                  <% if (!category.parentCategory) { %> <!-- Parent Category -->
-                    <li class="nav-item d-flex justify-content-between align-items-start">
-                      <div>
-                        <input class="form-check-input toggle-nested" type="checkbox" value="<%= category._id %>"
-                          id="<%= category.name %>Check">
-                        <label class="form-check-label" for="<%= category.name %>Check">
-                          <%= category.name %>
-                        </label>
-                        <ul class="list-unstyled collapse" id="<%= category.name %>Collapse">
-                          <% let foundSubcategories=false; categories.forEach(subcategory=> {
-                            %>
-                            <% if (subcategory.parentCategory &&
-                              String(subcategory.parentCategory._id)===String(category._id)) { %>
-                              <li class="ms-5">
-                                <a href="/shop?category=<%= subcategory._id %>" class="text-decoration-none text-dark">
-                                  <%= subcategory.name %>
-                                </a>
-                              </li>
-                              <% foundSubcategories=true; %>
+        <form id="filtersForm">
+          <div class="accordion" id="filterCollapse">
+            <!-- Categories Filter -->
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#categoryFilter" aria-expanded="false" aria-controls="categoryFilter">
+                  <strong>Categories</strong>
+                </button>
+              </h2>
+              <div id="categoryFilter" class="accordion-collapse collapse" data-bs-parent="#filterCollapse">
+                <div class="accordion-body">
+                  <div class="accordion" id="categoriesAccordion">
+                    <% categories.forEach(category=> { %>
+                      <% if (!category.parentCategory) { %>
+                        <div class="accordion-item border-0">
+                          <p class="accordion-header">
+                            <a class="text-decoration-none text-dark" data-bs-toggle="collapse"
+                              data-bs-target="#<%= category._id %>Accordion" aria-expanded="true"
+                              aria-controls="<%= category._id %>Accordion">
+                              <%= category.name %>
+                            </a>
+                          </p>
+                          <div id="<%= category._id %>Accordion" class="accordion-collapse collapse"
+                            data-bs-parent="#categoriesAccordion">
+                            <% categories.forEach(subcategory=> { %>
+                              <% if (subcategory.parentCategory &&
+                                String(subcategory.parentCategory._id)===String(category._id)) { %>
+                                <div class="accordion-body py-0">
+                                  <input class="form-check-input filter-checkbox" type="checkbox"
+                                    value="<%= subcategory._id %>" id="<%= subcategory._id %>" name="category">
+                                  <label class="form-check-label" for="<%= subcategory.name %>Check">
+                                    <%= subcategory.name %>
+                                  </label>
+                                </div>
                                 <% } %>
                                   <% }) %>
+                          </div>
+                        </div>
+                        <% } %>
+                          <% }) %>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                                    <% if (!foundSubcategories) { %>
-                                      <li class="ms-4 text-muted">No subcategories available</li>
-                                      <% } %>
-                        </ul>
+            <!-- Price Filter -->
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#priceFilter" aria-expanded="false" aria-controls="priceFilter">
+                  <strong>Prices</strong>
+                </button>
+              </h2>
+              <div id="priceFilter" class="accordion-collapse collapse" data-bs-parent="">
+                <div class="accordion-body">
+                  <ul class="navbar-nav px-3 ms-2">
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="price" value="0-500"
+                          id="price0-500">
+                        <label for="price0-500">0 - 500</label>
                       </div>
                     </li>
-                    <% } %>
-                      <% }) %>
-              </ul>
-            </div>
-          </div>
-
-
-          <form id="filterForm" method="GET" action="/shop">
-            <div class="border-bottom">
-              <a class="nav-link d-flex justify-content-between p-3 navlink" data-bs-toggle="collapse"
-                data-bs-target="#priceCollapse" href="#priceCollapse" role="button" aria-expanded="false"
-                aria-controls="priceCollapse"><strong>Filter by Price</strong>
-                <i class='bx bx-chevron-down'></i>
-              </a>
-              <div class="collapse mb-3" id="priceCollapse">
-                <ul class="navbar-nav px-3 ms-2">
-                  <li class="nav-item d-flex justify-content-between align-items-start">
-                    <div>
-                      <label for="priceRangeMin">Min Price:</label>
-                      <input type="range" class="form-range" name="minPrice" min="0" max="5000" step="20"
-                        id="priceRangeMin">
-                      <span id="minPriceLabel">₹0</span>
-
-                      <label for="priceRangeMax">Max Price:</label>
-                      <input type="range" class="form-range" name="maxPrice" min="0" max="5000" step="20"
-                        id="priceRangeMax">
-                      <span id="maxPriceLabel">₹5000</span>
-
-                      <p>Price: ₹<span id="minPriceText">0</span> - ₹<span id="maxPriceText">5000</span></p>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="border-bottom">
-              <a class="nav-link d-flex justify-content-between p-3 navlink" data-bs-toggle="collapse"
-                data-bs-target="#colorCollapse" href="#colorCollapse" role="button" aria-expanded="false"
-                aria-controls="colorCollapse"><strong>Filter by Color</strong>
-                <i class='bx bx-chevron-down'></i>
-              </a>
-              <div class="collapse mb-3" id="colorCollapse">
-                <ul class="navbar-nav px-3 ms-2">
-                  <li>
-                    <div class="d-flex align-items-center gap-2">
-                      <input class="form-check-input" type="checkbox" name="color" value="red" id="colorRed">
-                      <label for="colorRed">Red</label>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="d-flex align-items-center gap-2">
-                      <input class="form-check-input" type="checkbox" name="color" value="blue" id="colorBlue">
-                      <label for="colorBlue">Blue</label>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="d-flex align-items-center gap-2">
-                      <input class="form-check-input" type="checkbox" name="color" value="Green" id="colorGreen">
-                      <label for="colorGreen">Green</label>
-                    </div>
-                  </li>
-                  <!-- Add more colors as needed -->
-                </ul>
-              </div>
-            </div>
-
-            <div class="border-bottom">
-              <a class="nav-link d-flex justify-content-between p-3 navlink" data-bs-toggle="collapse"
-                data-bs-target="#sizeCollapse" href="#sizeCollapse" role="button" aria-expanded="false"
-                aria-controls="sizeCollapse"><strong>Filter by Size</strong>
-                <i class='bx bx-chevron-down'></i>
-              </a>
-              <div class="collapse mb-3" id="sizeCollapse">
-                <ul class="navbar-nav px-3 ms-2">
-                  <li>
-                    <input class="form-check-input" type="checkbox" name="size" value="S" id="sizeSCheck">
-                    <label class="form-check-label" for="sizeSCheck">S</label>
-                  </li>
-                  <li>
-                    <input class="form-check-input" type="checkbox" name="size" value="L" id="sizeLCheck">
-                    <label class="form-check-label" for="sizeLCheck">L</label>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <div class="col-lg-9">
-          <div class="row">
-            <% variants.forEach(({ variant,productId, productName, productBrand, productPrice, productFinalPrice })=> { %>
-              <div class="col-6 col-md-3 col-xl-2 mb-4">
-                <a href="/product/<%= variant._id %>" class="text-decoration-none text-dark">
-                <div class="card shadow-sm product-card">
-                  <i class="bi bi-heart"></i>
-                  <% if (variant.images.length> 0) { %>
-                    <img src="<%= variant.images[0].url %>" class="product-img card-img-top" alt="<%= productName %>">
-                    <% } %>
-                      <div class="card-body">
-                        <p class="card-title mb-1"><strong>
-                            <%= productBrand %>
-                          </strong></p>
-                        <p class="card-title mb-0">
-                          <%= productName %>
-                        </p>
-                        <p class="card-text m-0">&#8377;<%= productFinalPrice %> <del class="text-secondary ms-2">
-                              &#8377;<%= productPrice %></del></p>
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="price" value="500-1000"
+                          id="price500-1000">
+                        <label for="price500-1000">500 - 1000</label>
                       </div>
+                    </li>
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="price" value="1000-5000"
+                          id="price1000-5000">
+                        <label for="price1000-5000">1000 - 5000</label>
+                      </div>
+                    </li>
+                  </ul>
                 </div>
-              </a>
               </div>
-              <% }) %>
-          </div>
-        </div>
+            </div>
 
-        <!-- Sort Modal -->
-        <div class="modal fade bottom-sheet" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel"
-          aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="sortModalLabel">Sort</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- Color Filter -->
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#colorFilter" aria-expanded="false" aria-controls="colorFilter">
+                  <strong>Colors</strong>
+                </button>
+              </h2>
+              <div id="colorFilter" class="accordion-collapse collapse" data-bs-parent="">
+                <div class="accordion-body">
+                  <ul class="navbar-nav px-3 ms-2">
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="color" value="red"
+                          id="colorRed">
+                        <label for="colorRed">Red</label>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="color" value="blue"
+                          id="colorBlue">
+                        <label for="colorBlue">Blue</label>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="color" value="green"
+                          id="colorGreen">
+                        <label for="colorGreen">Green</label>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </div>
-              <div class="modal-body">
-                <ul class="list-group">
-                  <li class="list-group-item">Relevance</li>
-                  <li class="list-group-item">New Arrivals</li>
-                  <li class="list-group-item">Price (High to Low)</li>
-                  <li class="list-group-item">Price (Low to High)</li>
-                  <li class="list-group-item">Ratings</li>
-                  <li class="list-group-item">Discount</li>
-                </ul>
+            </div>
+
+            <!-- Size Filter -->
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#sizeFilter" aria-expanded="false" aria-controls="sizeFilter">
+                  <strong>Sizes</strong>
+                </button>
+              </h2>
+              <div id="sizeFilter" class="accordion-collapse collapse" data-bs-parent="">
+                <div class="accordion-body">
+                  <ul class="navbar-nav px-3 ms-2">
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="size" value="S"
+                          id="sizeS">
+                        <label for="sizeS">S</label>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="size" value="M"
+                          id="sizeM">
+                        <label for="sizeM">M</label>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="size" value="L"
+                          id="sizeL">
+                        <label for="sizeL">L</label>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="size" value="XL"
+                          id="sizeXL">
+                        <label for="sizeXL">XL</label>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="d-flex align-items-center gap-2">
+                        <input class="form-check-input filter-checkbox" type="checkbox" name="size" value="XXL"
+                          id="sizeXXL">
+                        <label for="sizeXXL">XXL</label>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
+        </form>
+      </div>
+
+      <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-list-columns" style="font-size: 16px;"></i>
+            <p id="paginationResult" class="m-0 ps-2" style="font-size: 12px;"></p>
+          </div>
+          <div class="bg-light px-2 rounded">
+            <label for="product-sort" class="dropdown-label">Sort by:</label>
+            <select id="product-sort" class="bg-light">
+              <option value="popularity">Popularity</option>
+              <option value="-createdAt">Newest</option>
+              <option value="-price">Price: High to Low</option>
+              <option value="price">Price: Low to High</option>
+            </select>
+          </div>
         </div>
 
+        <div class="row" id="productsContainer"></div>
+        <div id="pagination" class="d-flex justify-content-end align-items-center mb-5"></div>
+      </div>
+    </div>
+  </div>
 
-        <%- include('../partials/footer') -%>
-          <!-- JavaScript for Mobile Filter Interaction -->
-          <script>
-            document.addEventListener('DOMContentLoaded', function () {
-              // Toggle nested collapse based on checkbox state
-              document.querySelectorAll('.toggle-nested').forEach(function (checkbox) {
-                checkbox.addEventListener('change', function () {
-                  const targetId = this.nextElementSibling.nextElementSibling.id; // Get the next collapse element ID
-                  const targetCollapse = document.getElementById(targetId);
-                  const collapseInstance = new bootstrap.Collapse(targetCollapse, {
-                    toggle: false
-                  });
+  <%- include('../partials/footer') -%>
 
-                  if (this.checked) {
-                    collapseInstance.show();
-                  } else {
-                    collapseInstance.hide();
-                  }
-                });
+
+    <script>
+      const fetchProducts = async (params = {}) => {
+        try {
+          const url = new URL('/shop', window.location.origin);
+          Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+          const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+          const { products, pagination, wishlist } = await response.json();
+
+          renderProducts(products, wishlist);
+          renderPagination(pagination);
+        } catch (error) {
+          console.error('Error fetching products:', error);
+          createToast('Failed to load products', 'error');
+        }
+      };
+
+      const renderProducts = (products, wishlist) => {
+        const productList = document.getElementById('productsContainer');
+        productList.innerHTML = '';
+
+        const token = "<%= token %>";
+
+        products.forEach(product => {
+          const isInWishlist = wishlist && wishlist.includes(product._id.toString());
+          const productCardTemplate = `
+                      <div class="col-6 col-md-3 mb-4">
+                          <div class="card shadow-sm product-card">
+                              ${token ? `
+                                  <i class="btn-wishlist bi ${isInWishlist ? 'bi-heart-fill text-danger' : 'bi-heart'}"
+                                     data-product-id="${product._id}"
+                                     data-in-wishlist="${isInWishlist ? 'true' : 'false'}"
+                                     style="cursor: pointer;"></i>
+                              ` : `
+                                  <a href="/auth/login"><i class="bi bi-heart" style="color: black;"></i></a>
+                              `}
+                              <a href="/product/${product._id}/0" class="text-decoration-none text-dark">
+                                  ${product.variants[0].images.length > 0 ? `<img src="${product.variants[0].images[0]}" class="product-img card-img-top" alt="${product.name}">` : ''}
+                                  <div class="card-body">
+                                      <p class="card-title mb-1"><strong>${product.brand}</strong></p>
+                                      <p class="card-title mb-0">${product.name} ${product.variants[0].color}</p>
+                                      <p class="card-text m-0">
+                                          &#8377;${product.discountedPrice.toFixed(2)}
+                                          ${product.discountedPrice < product.price ? `
+                                              <del class="text-secondary ms-2">&#8377;${product.price.toFixed(2)}</del>
+                                              <span class="text-danger ms-2">
+                                                  (Save ${(100 * (product.price - product.discountedPrice) / product.price).toFixed(0)}%)
+                                              </span>` : ''}
+                                      </p>
+                                  </div>
+                              </a>
+                          </div>
+                      </div>
+                  `;
+
+          productList.insertAdjacentHTML('beforeend', productCardTemplate);
+        });
+
+        initializeWishlistButtons();
+      };
+      const initializeWishlistButtons = () => {
+        document.querySelectorAll('.btn-wishlist').forEach(heartIcon => {
+          heartIcon.addEventListener('click', async function () {
+            const token = "<%= token %>";
+            if (!token) {
+              window.location.href = "/auth/login";
+              return;
+            }
+
+            const productId = this.dataset.productId;
+            const isInWishlist = this.dataset.inWishlist === 'true';
+
+            try {
+              const response = await fetch(`/protected/wishlist/${isInWishlist ? 'remove' : 'add'}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ productId })
               });
+              const result = await response.json();
 
-              const filterForm = document.getElementById('filterForm');
+              if (result.success) {
+                this.dataset.inWishlist = isInWishlist ? 'false' : 'true';
+                if (isInWishlist) {
+                  this.classList.remove('bi-heart-fill');
+                  this.classList.add('bi-heart');
+                  this.style.color = 'black';
+                } else {
+                  this.classList.remove('bi-heart');
+                  this.classList.add('bi-heart-fill');
+                  this.style.color = 'red';
+                }
+              } else {
+                createToast(result.message, 'error');
+              }
+            } catch (error) {
+              console.error('Error updating wishlist:', error);
+              createToast('Failed to update wishlist', 'error');
+            }
+          });
+        });
+      };
 
-              // Function to handle filtering
-              const applyFilters = () => {
-                const formData = new FormData(filterForm);
-                const queryString = new URLSearchParams(formData).toString();
+      document.getElementById('product-sort').addEventListener('change', function () {
+        const sortOption = this.value;
+        const filters = new URLSearchParams(window.location.search);
+        filters.set('sort', sortOption);
+        fetchProducts({
+          page: filters.get('page') || 1,
+          sort: sortOption,
+          ...Object.fromEntries(filters)
+        });
+      });
+      const handleSortChange = (sortValue) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('sort', sortValue);
+        fetchProducts(Object.fromEntries(urlParams.entries()));
+      };
 
-                // Make an AJAX request to fetch filtered products
-                fetch(`/shop?${queryString}`, {
-                  headers: {
-                    'X-Requested-With': 'XMLHttpRequest' // Indicate it's an AJAX request
-                  }
-                })
-                  .then(response => response.text())
-                  .then(data => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(data, 'text/html');
-                    const productsContainer = doc.querySelector('.row');
-                    document.querySelector('.row').innerHTML = productsContainer.innerHTML;
-                  })
-                  .catch(error => console.error('Error:', error));
-              };
+      document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+          const filters = new URLSearchParams(window.location.search);
+          const filterName = this.name;
+          const filterValue = this.value;
 
-              // Add event listeners to all filter inputs
-              const filterInputs = filterForm.querySelectorAll('input');
-              filterInputs.forEach(input => {
-                input.addEventListener('change', applyFilters);
-              });
-            });
+          if (this.checked) {
+            filters.append(filterName, filterValue);
+          } else {
+            filters.delete(filterName);
+          }
 
-            const priceRangeMin = document.getElementById('priceRangeMin');
-            const priceRangeMax = document.getElementById('priceRangeMax');
-            const minPriceText = document.getElementById('minPriceText');
-            const maxPriceText = document.getElementById('maxPriceText');
+          fetchProducts({
+            page: filters.get('page') || 1,
+            sort: filters.get('sort') || '-createdAt',
+            ...Object.fromEntries(filters)
+          });
+        });
+      });
 
-            priceRangeMin.addEventListener('input', () => {
-              minPriceText.textContent = priceRangeMin.value;
-              applyFilters(); // Call the filter function on change
-            });
+      const handleFilterChange = () => {
+        const formData = new FormData(document.getElementById('filtersForm'));
+        const params = new URLSearchParams();
 
-            priceRangeMax.addEventListener('input', () => {
-              maxPriceText.textContent = priceRangeMax.value;
-              applyFilters(); // Call the filter function on change
-            });
+        formData.forEach((value, key) => {
+          if (key === "category" || key === "color" || key === "size") {
+            params.append(key, value);
+          }
+        });
 
+        fetchProducts(Object.fromEntries(params.entries()));
+      };
+      function renderPagination(pagination) {
+        const paginationContainer = document.getElementById('pagination');
+        const paginationResultContainer = document.getElementById('paginationResult');
+        paginationContainer.innerHTML = '';
 
-            document.getElementById('resetFiltersBtn').addEventListener('click', () => {
-              // Clear all form inputs
-              filterForm.reset();
+        paginationResultContainer.innerHTML = `Showing ${pagination.start} to ${pagination.end} of ${pagination.total} results`;
 
-              // Reset the price labels
-              minPriceText.textContent = '0';
-              maxPriceText.textContent = '5000';
+        const paginationTemplate = `
+                      <nav aria-label="Page navigation">
+                          <ul class="pagination mb-0 d-flex gap-2">
+                              <li class="page-item">
+                                  <button
+                                      class="page-link ${pagination.prevPageUrl ? 'bg-dark' : 'bg-light'}"
+                                      ${pagination.prevPageUrl ? '' : 'disabled'}
+                                      onclick="fetchProducts({ page: ${pagination.currentPage - 1} })"
+                                  >
+                                      <span aria-hidden="true">
+                                          <i class="bx bx-arrow-back ${pagination.prevPageUrl ? 'text-white' : 'text-black'}"></i>
+                                      </span>
+                                  </button>
+                              </li>
+                              <li class="page-item">
+                                  <button
+                                      class="page-link ${pagination.nextPageUrl ? 'bg-dark' : 'bg-light'}"
+                                      ${pagination.nextPageUrl ? '' : 'disabled'}
+                                      onclick="fetchProducts({ page: ${pagination.currentPage + 1} })"
+                                  >
+                                      <span aria-hidden="true">
+                                          <i class="bx bx-arrow-back bx-rotate-180 ${pagination.nextPageUrl ? 'text-white' : 'text-black'}"></i>
+                                      </span>
+                                  </button>
+                              </li>
+                          </ul>
+                      </nav>
+              `;
+        paginationContainer.insertAdjacentHTML('beforeend', paginationTemplate);
+      }
+      document.getElementById('product-sort').addEventListener('change', (e) => {
+        handleSortChange(e.target.value);
+      });
 
-              // Optionally reset any URL parameters and reload the page without any filters
-              window.location.href = '/shop';
-            });
-          </script>
+      const filtersForm = document.getElementById('filtersForm');
+      if (filtersForm) {
+        filtersForm.addEventListener('change', handleFilterChange);
+      }
+      fetchProducts({
+        page: new URLSearchParams(window.location.search).get('page') || 1,
+        sort: new URLSearchParams(window.location.search).get('sort') || '-createdAt',
+      });
+    </script>

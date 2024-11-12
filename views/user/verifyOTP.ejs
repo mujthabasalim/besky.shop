@@ -30,32 +30,32 @@
       <div class="col-lg-5 d-flex justify-content-center">
         <div class="form-section">
           <h4 class="fw-bold mb-0">Verify OTP</h4>
-          <% if (locals.message) {%>
-            <p class="text-secondary">
-              <%- message %>
-            </p>
-            <% } %>
-              <% if (locals.errorMessage) {%>
-                <p class="error">
-                  <%= errorMessage %>
-                </p>
-                <% } %>
+          <!-- Display Success Flash Message -->
+          <% if (successMessage && successMessage.length > 0) { %>
+            <p class="text-success" id="success-message"><%- successMessage %></p>
+          <% } %>
+          
+          <!-- Display Error Flash Message -->
+          <% if (errorMessage && errorMessage.length > 0) { %>
+            <p class="error-message" id="error-message"><%- errorMessage %></p>
+          <% } %>
                   <br>
-                  <form id="verify-otp-form" action="/auth/verify-otp" method="POST">
+                  <form id="verifyOtpForm" action="/auth/verify-otp" method="POST">
                     <div class="otp-container d-flex justify-content-between gap-2 mb-2">
-                      <input type="text" class="otp-input" maxlength="1" id="otp1" name="otp1" required>
-                      <input type="text" class="otp-input text-center" maxlength="1" id="otp2" name="otp2" required>
-                      <input type="text" class="otp-input" maxlength="1" id="otp3" name="otp3" required>
-                      <input type="text" class="otp-input" maxlength="1" id="otp4" name="otp4" required>
-                      <input type="text" class="otp-input" maxlength="1" id="otp5" name="otp5" required>
-                      <input type="text" class="otp-input" maxlength="1" id="otp6" name="otp6" required>
+                      <input type="number" class="otp-input" maxlength="1" id="otp1" name="otp1" >
+                      <input type="number" class="otp-input" maxlength="1" id="otp2" name="otp2" >
+                      <input type="number" class="otp-input" maxlength="1" id="otp3" name="otp3" >
+                      <input type="number" class="otp-input" maxlength="1" id="otp4" name="otp4" >
+                      <input type="number" class="otp-input" maxlength="1" id="otp5" name="otp5" >
+                      <input type="number" class="otp-input" maxlength="1" id="otp6" name="otp6" >
                     </div>
+                    <div id="otpError" class="error-message"></div>
 
                     <div class="d-flex justify-content-between resend-container">
                       <p class="text-secondary">
                         Resend OTP in <span id="countdown">30</span> seconds
                       </p>
-                      <a href="/auth/verify-otp" id="resend-link"
+                      <a href="/auth/resend-otp/register" id="resend-link"
                         class="text-muted text-decoration-none resend-link">Resend OTP</a>
                     </div>
                     <button type="submit" class="btn btn-dark mb-3">Verify OTP</button>

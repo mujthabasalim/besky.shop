@@ -1,0 +1,74 @@
+<%- include('../partials/adminHeader') -%>
+<style>
+  .order-link a {
+    text-decoration: none;
+  }
+</style>
+<div class="content">
+  <div class="d-flex justify-content-between align-items-center heading">
+    <h2>Notifications</h2>
+  </div>
+  <% if (notifications.length > 0) { %>
+    <% notifications.forEach(notification => { %>
+      <div class="d-flex justify-content-between align-items-center border-bottom transaction-item mb-3 py-3 <%= notification.isRead ? '' : 'bg-light' %>" id="notification-<%= notification._id %>">
+        <div class="d-flex align-items-center">
+          <i class="<%= notification.iconClass %> bg-light p-2 rounded fs-1 me-3"></i>
+          <div>
+            <strong><%= notification.title %></strong>
+            <span class="ms-1 text-secondary" style="font-size: 12px;">
+              <%= notification.formattedDate %> | <%= notification.formattedTime %>
+            </span>
+            <p class="m-0 text-secondary" style="font-size: 12px;">
+              <%= notification.refType %> ID: <%= notification.refId %><br>
+              <span class="text-black order-link"><%- notification.message %></span>
+            </p>
+          </div>
+        </div>
+        <% if (!notification.isRead) { %>
+          <button class="btn btn-sm btn-outline-dark mark-as-read-btn me-3" data-id="<%= notification._id %>">
+            Mark as Read
+          </button>
+        <% } %>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p>No new notifications</p>
+  <% } %>
+</div>
+
+<%- include('../partials/adminFooter') -%>
+<script>
+  // Event listener for marking notifications as read
+  document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('mark-as-read-btn')) {
+      const notificationId = event.target.getAttribute('data-id');
+
+      // Fetch API to send the POST request
+      fetch(`/admin/notifications/${notificationId}/mark-as-read`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Check if the element exists before trying to modify it
+        const notificationElement = document.getElementById(`notification-${notificationId}`);
+        if (notificationElement) {
+          notificationElement.classList.remove('bg-light');
+          event.target.remove();
+        } else {
+          console.error(`Notification element not found for ID: ${notificationId}`);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to mark notification as read:', err);
+      });
+    }
+  });
+</script>

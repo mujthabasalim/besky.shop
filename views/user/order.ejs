@@ -1,0 +1,201 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<style>
+  .product-image {
+    width: 70px;
+  }
+
+  .order-status {
+    width: max-content;
+    border-radius: 2px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .pending-text {
+    width: max-content;
+    border-radius: 2px;
+    padding: 0 4px;
+    color: #E3B231;
+    background-color: #e3b13136;
+  }
+
+  .delivered-text {
+    width: max-content;
+    border-radius: 2px;
+    padding: 0 4px;
+    color: #155724;
+    background-color: #c3e6cb;
+  }
+
+  .cancelled-text, .returned-text {
+    width: max-content;
+    border-radius: 2px;
+    padding: 0 4px;
+    color: #721c24;
+    background-color: #f5c6cb;
+  }
+</style>
+
+<div class="content">
+  <div class="container">
+    <h3 class="mb-4">My Orders</h3>
+    <% orders.forEach((order, index) => { %>
+      <div class="bg-light mb-3">
+          <div class="profile-card border-bottom p-3">
+            <div class="row">
+              <div class="col-md-7">
+                <div class="d-flex align-items-center">
+                  <img src="<%= order.items[0].image %>" alt="<%= order.items[0].name %>" class="product-image me-3">
+                  <div class="order-item-details">
+                    <p class="m-0">
+                      <%= order._id %>
+                    </p>
+                    <p class="m-0 text-black-50" style="font-size: 14px;">
+                      Number of ordered items: <%= order.items.length %> 
+                    </p>
+                    <p class="m-0" style="font-size: 14px;">
+                      Grand Total: <%= order.grandTotal %>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-5">
+                <div class="profile-actions d-flex align-items-center justify-content-between justify-content-md-end gap-2">
+                  <div class="d-md-none order-status <%= order.orderStatus.toLowerCase() %>">
+                    <%= order.orderStatus %>
+                  </div>
+                  <div class="d-flex flex-md-column gap-3">
+                    <a href="/protected/orders?order=<%= order._id %>" class="btn btn-dark w-100">View Order</a>
+                    <% if (order.orderStatus === 'delivered') { %>
+                      <button type="button" class="btn btn-outline-dark w-100" onclick="openModal('return', '<%= order._id %>')">Return</button>
+                    <% } else if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'returned' ) { %>
+                      <button type="button" class="btn btn-outline-dark w-100" onclick="openModal('cancel', '<%= order._id %>')">Cancel</button>
+                    <% } else if (order.orderStatus === 'cancelled' || order.orderStatus === 'returned') { %>
+                      <a href="/shop" type="button" class="btn btn-outline-dark w-100">Shop More</a>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+              <div class="d-none d-md-block order-status <%= order.orderStatus.toLowerCase() %>"></div>
+            </div>
+          </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- Modal Template for Cancel/Return -->
+<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="actionModalLabel">Reason for <span id="actionType"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="actionForm">
+          <div class="mb-3">
+            <label for="reason" class="form-label">Write a reason:</label>
+            <textarea class="form-control" id="reason" rows="3" required></textarea>
+            <div class="error-message" id="reasonError"></div>
+          </div>
+          <input type="hidden" id="orderId">
+          <input type="hidden" id="itemId">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-dark" id="submitAction">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let actionType = '';
+
+function openModal(action, orderId) {
+  actionType = action;
+  document.getElementById('actionType').textContent = action === 'cancel' ? 'Cancellation' : 'Return';
+  document.getElementById('orderId').value = orderId;
+  document.getElementById('itemId').value = itemId;
+  document.getElementById('reason').value = '';
+  const modal = new bootstrap.Modal(document.getElementById('actionModal'));
+  modal.show();
+}
+
+document.getElementById('submitAction').addEventListener('click', function() {
+  const reason = document.getElementById('reason').value;
+  const orderId = document.getElementById('orderId').value;
+  const itemId = document.getElementById('itemId').value;
+
+  if (!reason) {
+    document.getElementById('reasonError').textContent = 'Please provide a reason.';
+    document.getElementById('reason').classList.add('is-invalid');
+    return;
+  }
+
+  fetch(`/protected/order/${actionType}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ orderId, itemId, reason })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      Swal.fire({
+        title: 'Success!',
+        text: data.message,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        timer: 3000
+      }).then(() => {
+        location.reload();
+      });
+    } else {
+      Swal.fire({
+        title: 'Failed!',
+        text: data.message,
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    Swal.fire({
+      title: 'Error!',
+      text: 'Something went wrong. Please try again later.',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  const orderStatusElements = document.querySelectorAll(".order-status");
+
+  orderStatusElements.forEach((element) => {
+    if (element.classList.contains("pending")) {
+      element.innerHTML = '<span class="pending-text">Pending:</span> Your order is in pending';
+    } else if (element.classList.contains("processing")) {
+      element.innerHTML = '<span class="pending-text">In Process:</span> Your order has been processing';
+    } else if (element.classList.contains("shipped")) {
+      element.innerHTML = '<span class="delivered-text">Shipped:</span> Your order has been shipped';
+    } else if (element.classList.contains("delivered")) {
+      element.innerHTML = '<span class="delivered-text">Delivered:</span> Your order has been delivered';
+    } else if (element.classList.contains("cancelled")) {
+      element.innerHTML = '<span class="cancelled-text">Cancelled:</span> Your order order was canceled';
+    } else if (element.classList.contains("returned")) {
+      element.innerHTML = '<span class="returned-text">Returned:</span> Your order order was returned';
+    }
+  });
+});
+
+</script>
+
+<%- include('../partials/footer') %>

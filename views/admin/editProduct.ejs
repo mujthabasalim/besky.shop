@@ -5,9 +5,8 @@
         <h2>Edit Product</h2>
       </div>
       <% if (locals.errorMessage) { %>
-        <p>errorMessage
-          <% }%>
-        </p>
+        <p><%= errorMessage %></p>
+        <% }%>
         <form id="productForm" action="/admin/update-product/<%= product._id %>" method="POST"
           enctype="multipart/form-data">
           <!-- Product Details -->
@@ -58,9 +57,8 @@
               <div class="error-message" id="priceError"></div>
             </div>
             <div class="w-100 mb-3">
-              <label for="discount">Discount (%)</label>
-              <input type="number" step="0.01" class="form-control" id="discount" name="discount"
-                value="<%= product.discount %>" />
+              <label for="attributes">Attributes (comma separated)</label>
+              <input type="text" class="form-control" id="attributes" name="attributes" value="<%= product.attributes %>" />
             </div>
           </div>
           <div class="mb-3">
@@ -107,7 +105,7 @@
                     <label for="variantStock-<%= index %>">Stock<span class="required-star">*</span> (comma
                       separated)</label>
                     <input type="text" class="form-control" id="variantStock-<%= index %>"
-                      name="variants[<%= index %>][stock]" value="<%= variant.sizes.map(s => s.stock).join(', ') %>"
+                      name="variants[<%= index %>][stocks]" value="<%= variant.sizes.map(s => s.stock).join(', ') %>"
                       data-required="true">
                     <div class="error-message" id="variantStockError"></div>
                   </div>
@@ -115,19 +113,27 @@
                 <label>Images<span class="required-star">*</span> (Maximum 6)</label>
                 <div class="form-group mb-3">
                   <div class="variant-images-container d-flex flex-wrap gap-3 mb-2" data-variant-index="<%= index %>">
-                    <% variant.images.forEach(function(image) { %>
+                    <% variant.images.forEach((image, imageIndex) => { %>
                       <div class="form-group d-flex flex-column position-relative">
-                        <img class="img-preview custom-image mb-2" src="<%= image.url %>" />
-                        <input type="file" class="image-input" name="variants[<%= index %>][newImages][]" />
-                        <!-- Hidden input field for existing image IDs -->
+                        <!-- Image preview -->
+                        <img class="img-preview custom-image mb-2" src="<%= image %>" />
+                
+                        <!-- Hidden input to retain the old image if no new image is uploaded -->
+                        <input type="hidden" name="variants[<%= index %>][existingImages][<%= imageIndex %>]" value="<%= image %>">
+                
+                        <!-- File input for changing the image -->
+                        <input type="file" class="image-input" name="variants[<%= index %>][newImages][<%= imageIndex %>]">
                         <label class="image-label btn btn-dark">Change File</label>
-                        <!-- <input type="hidden" class="z-index-10" name="variants[<%= index %>][existingImageIds][]" value="<%= image._id %>"> -->
-                        <button type="button" class="btn btn-outline-danger btn-sm delete-image-btn"
-                          data-image-id="<%= image._id %>">
+
+                        <!-- Hidden input to hold product ID -->
+                        <input type="hidden" id="product-id" value="<%= product._id %>">
+                
+                        <!-- Button to remove the image -->
+                        <button type="button" class="btn btn-outline-danger btn-sm delete-image-btn" data-variant-index="<%= index %>" data-image-index="<%= imageIndex %>">
                           <i class="bi bi-trash3"></i>
                         </button>
                       </div>
-                      <% }); %>
+                    <% }); %>
                   </div>
                   <button type="button" class="btn btn-outline-dark btn-sm add-image-btn"
                     data-variant-index="<%= index %>">Add Image</button>
@@ -202,4 +208,5 @@
     </div>
   </div>
 
+  <script src="/public/js/product.js"></script>
   <%- include('../partials/adminFooter') -%>

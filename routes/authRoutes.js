@@ -1,9 +1,9 @@
 const express = require('express');
 const passport = require('passport');
 const authController = require('../controllers/authController');
-const { userValidationRules, loginValidator } = require('../utils/validators');
+const { userValidationRules, loginValidator, resetValidator } = require('../utils/validators');
 const handleValidationErrors = require('../middleware/handleValidationErrors');
-const { checkToken, preventAuthAccess } = require('../middleware/authMiddleware');
+const { preventAuthAccess } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -20,8 +20,9 @@ router.get('/register', preventAuthAccess, authController.loadRegister);
 router.post('/register', userValidationRules, handleValidationErrors, authController.register);
 
 // OTP verification routes
-router.get('/verify-otp', authController.loadVerify);
+router.get('/verify-otp', authController.loadVerifyOTP);
 router.post('/verify-otp', authController.verifyOTP);
+router.get('/resend-otp/:type', authController.resendOTP);
 
 // Login routes
 router.get('/login', preventAuthAccess, authController.loadLogin);
@@ -29,9 +30,9 @@ router.post('/login', loginValidator, handleValidationErrors, authController.log
 
 // Password recovery routes
 router.get('/forgot-password', authController.loadForgotPassword);
-router.post('/forgot-password', authController.forgotPassword);
+router.post('/forgot-password', handleValidationErrors, authController.forgotPassword);
 router.get('/reset-password', authController.loadResetPassword);
-router.post('/reset-password', authController.resetPassword);
+router.post('/reset-password', resetValidator, handleValidationErrors, authController.resetPassword);
 
 // Logout route
 router.get('/logout', authController.logout);

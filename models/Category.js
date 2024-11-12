@@ -6,11 +6,7 @@ const CategorySchema = new Schema({
     type: String,
     required: true,
   },
-  status: {
-    type: String,
-    enum: ['Active', 'Inactive'],
-    default: 'Active',
-  },
+  isActive: { type: Boolean, default: true },
   parentCategory: {
     type: Schema.Types.ObjectId,
     ref: 'Category',

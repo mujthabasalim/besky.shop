@@ -1,14 +1,22 @@
 const express = require('express');
 const session = require('express-session');
+const flash = require('connect-flash');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const path = require('path');
 const passport = require('./config/passport');
 const connectDB = require('./config/db');
 const nocache = require('nocache');
+const methodOverride = require('method-override');
+// Routes
+const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(methodOverride('_method'));
 
 // Connect to the database
 connectDB();
@@ -24,7 +32,17 @@ app.use(session({
   secret: process.env.SESSION_SECRET_KEY,
   resave: false,
   saveUninitialized: true,
+  cookie: { secure: false }
 }));
+
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.successMessage = req.flash('success');
+  res.locals.errorMessage = req.flash('error');
+  next();
+});
+
 
 app.use(nocache());
 
@@ -40,14 +58,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 // app.use('/assets', express.static(path.join(__dirname, './public/assets')));
 
-// Routes
-const authRoutes = require('./routes/authRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const userRoutes = require('./routes/userRoutes');
 
-app.use('/', userRoutes);
+
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+app.use('/', userRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {

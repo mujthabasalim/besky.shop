@@ -1,0 +1,256 @@
+<%- include('../partials/header') %>
+  <%- include('../partials/sidebar') %>
+
+    <style>
+      .product-image {
+        width: 70px;
+      }
+
+      /* Mobile view order status */
+      .order-status {
+        width: max-content;
+        border-radius: 2px;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      /* Pending Status - Yellow */
+      .pending-text {
+        width: max-content;
+        border-radius: 2px;
+        padding: 0 4px;
+        color: #E3B231;
+        background-color: #e3b13136;
+      }
+
+      /* Delivered Status - Green */
+      .delivered-text {
+        width: max-content;
+        border-radius: 2px;
+        padding: 0 4px;
+        color: #155724;
+        background-color: #c3e6cb;
+      }
+
+      /* Canceled Status - Red */
+      .cancelled-text,
+      .returned-text {
+        width: max-content;
+        border-radius: 2px;
+        padding: 0 4px;
+        color: #721c24;
+        background-color: #f5c6cb;
+      }
+    </style>
+
+    <div class="content">
+      <div class="container p-0">
+        <h3 class="mb-4">Order Details</h3>
+        <div class="row shadow-sm mb-4">
+          <div class="col-lg-8 col-md-12 mb-3 p-0">
+            <div class="card border-0 rounded p-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                <strong>Estimated delivery:--,--,-- </strong>
+                  <p class="m-0 ms-3 order-status <%= order.orderStatus.toLowerCase() %>">
+                    Order Status: <%= order.orderStatus.toUpperCase() %>
+                  </p>
+                </div>
+                <button class="btn btn-outline-danger <%= (order.orderStatus === 'delivered' || order.orderStatus === 'returned') ? 'd-block' : 'd-none' %>" id="invoiceBtn" data-order-id="<%= order._id %>" style="width: max-content;">
+                  Invoice
+              </button>              
+                <button class="btn btn-dark <%= (order.paymentStatus === 'failed') ? 'd-block' : 'd-none' %>" id="retryBtn" data-order-id="<%= order._id %>" style="width: max-content;">
+                  Retry Payment 
+              </button>              
+              </div>
+              <!-- Shipping Address Section -->
+              <p>Order ID: <%= order._id.toString().toUpperCase() %>
+              </p>
+              <p>Payment Method: <%= order.paymentMethod.toUpperCase() %>
+              </p>
+              <p>Payment Status: <%= order.paymentStatus.toUpperCase() %>
+              </p>
+              <strong>Shipping Address</strong>
+              <p class="m-0">
+                <%= order.shippingAddress.fName %>
+                  <%= order.shippingAddress.lName %>
+              </p>
+              <p class="m-0">
+                <%= order.shippingAddress.houseName %>, <%= order.shippingAddress.area %>, <%=
+                      order.shippingAddress.city %>, <%= order.shippingAddress.postcode %>
+              </p>
+              <p class="m-0">
+                <%= order.shippingAddress.contactNo %>
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Summary Section -->
+          <div class="col-lg-4 col-md-12 mb-3">
+            <div class="shadow-sm p-3">
+              <h5>Summary</h5>
+              <hr>
+              <div class="d-flex justify-content-between">
+                <p class="mb-2">Subtotal</p>
+                <p class="mb-2" id="subtotalAmount">&#8377;<%= order.subtotal.toFixed(2) %>
+                </p>
+              </div>
+              <div class="d-flex justify-content-between">
+                <p class="mb-2">Discount</p>
+                <p class="mb-2" id="discount">&#8377;<%= order.couponDiscount.toFixed(2) %>
+                </p>
+              </div>
+              <div class="d-flex justify-content-between">
+                <p class="mb-2">Delivery Charge</p>
+                <p class="mb-2" id="deliveryCharge">
+                  &#8377;<%= order.deliveryCharge.toFixed(2) %>
+                </p>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between">
+                <p class="fw-bold">Grand Total</p>
+                <p class="fw-bold" id="grandTotal">&#8377;<%= order.grandTotal.toFixed(2) %>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <strong>Order Items</strong>
+        <% order.items.forEach((item, index)=> { %>
+          <div class="d-flex flex-column flex-md-row align-items-center justify-content-between py-3 border-bottom">
+            <div class="d-flex align-self-start">
+              <img src="<%= item.image %>" alt="<%= item.name %>" class="product-image me-3">
+              <div>
+                <p class="m-0" style="text-wrap: nowrap;">
+                  <%= item.name %>
+                </p>
+                <p class="m-0 text-black-50" style="font-size: 14px;">
+                  Size: <%= item.size %> <span class="ms-1"> | Color: <%= item.color %></span>
+                </p>
+                <p class="m-0" style="font-size: 14px;">
+                  Qty: <%= item.quantity %>
+                </p>
+              </div>
+            </div>
+            <button type="button" class="btn btn-dark align-self-end align-self-md-centre">Add Review</button>
+          </div>
+          <% }) %>
+      </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const orderStatusElements = document.querySelectorAll(".order-status");
+
+        orderStatusElements.forEach((element) => {
+          if (element.classList.contains("pending")) {
+            element.innerHTML = '<span class="pending-text">Pending</span>';
+          } else if (element.classList.contains("shipped")) {
+            element.innerHTML = '<span class="delivered-text">Shipped</span>';
+          } else if (element.classList.contains("delivered")) {
+            element.innerHTML = '<span class="delivered-text">Delivered</span>';
+          } else if (element.classList.contains("cancelled")) {
+            element.innerHTML = '<span class="cancelled-text">Cancelled</span>';
+          } else if (element.classList.contains("pending-approval")) {
+            element.innerHTML = '<span class="pending-text">Return in pending</span>';
+          } else if (element.classList.contains("returned")) {
+            element.innerHTML = '<span class="returned-text">Returned</span>';
+          }
+        });
+      });
+
+      // Attach event listeners for download invoice
+      const invoiceBtn = document.getElementById('invoiceBtn');
+      if (invoiceBtn) {
+        invoiceBtn.addEventListener('click', () => {
+          const orderId = invoiceBtn.dataset.orderId;
+
+            window.location.href = `/protected/download-invoice?orderId=${orderId}`;
+
+        });
+      }
+    </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const retryBtn = document.getElementById("retryBtn");
+    
+    if (retryBtn) {
+      retryBtn.addEventListener("click", async function () {
+        const orderId = this.dataset.orderId;
+        try {
+          // Fetch the Razorpay order ID from the server
+          const response = await fetch(`/protected/retry-payment/${orderId}`, { method: "POST" });
+          const result = await response.json();
+
+          if (result.success && result.razorpayOrderId) {
+            // Set up Razorpay options
+            const razorpayOptions = {
+              key: "<%= process.env.RAZORPAY_ID_KEY %>", // Razorpay Key ID
+              amount: result.amount * 100,
+              currency: "INR",
+              name: "be.sky",
+              description: "Retry Payment",
+              order_id: result.razorpayOrderId,
+              handler: function (paymentResponse) {
+                verifyRetryPayment(paymentResponse, orderId);
+              },
+              prefill: {
+                name: "<%= order.shippingAddress.fName %>",
+                email: "<%= order.shippingAddress.email %>",
+                contact: "<%= order.shippingAddress.contactNo %>",
+              },
+              theme: { color: "#000000" },
+            };
+
+            // Open Razorpay modal for retry payment
+            openRazorpay(razorpayOptions);
+          } else {
+            createToast('Failed to initiate retry payment. Please try again.', 'error');
+          }
+        } catch (error) {
+          console.error("Error initiating retry payment:", error);
+          createToast('Failed to retry payment. Please try again.', 'error');
+        }
+      });
+    }
+  });
+
+  // Function to open Razorpay modal
+  function openRazorpay(options) {
+    const razorpay = new Razorpay(options);
+    razorpay.open();
+  }
+
+  // Function to verify retry payment
+  async function verifyRetryPayment(response, orderId) {
+    try {
+      const paymentResponse = await fetch('/protected/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          razorpayPaymentId: response.razorpay_payment_id || null,
+          razorpayOrderId: response.razorpay_order_id || null,
+          razorpaySignature: response.razorpay_signature || null,
+          orderId: orderId,
+        }),
+      });
+
+      if (paymentResponse.ok) {
+        createToast('Payment successful!', 'success');
+        location.reload(); 
+      } else {
+      createToast('Payment verification failed. Please try again.', 'error');
+      }
+    } catch (error) {
+      console.error("Error verifying payment:", error);
+      createToast('Failed to verify payment. Please try again.', 'error');
+    }
+  }
+</script>
+
+    <%- include('../partials/footer') %>

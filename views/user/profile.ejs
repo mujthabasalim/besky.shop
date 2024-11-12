@@ -1,0 +1,520 @@
+<%- include('../partials/header') %>
+
+<%- include('../partials/sidebar') %>
+
+  <style>
+    .profile-img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .edit-btn {
+      position: absolute;
+      top: 70px;
+      left: 70px;
+      background-color: #000;
+      color: white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .profile-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* .form-container {
+      max-width: 600px;
+      margin: auto;
+      margin-top: 50px;
+  } */
+
+    .profile-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .profile-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .profile-actions .btn {
+      border-radius: 8px;
+    }
+
+    .address-type {
+      font-size: 12px;
+      background: #eee;
+      border-radius: 2px;
+    }
+
+    .modal-md {
+      max-width: 60%;
+      max-height: 70vh;
+      margin: auto;
+    }
+
+    .modal-md .modal-content {
+      height: auto;
+    }
+
+    .img-container {
+      width: 100%;
+      height: 50vh;
+      overflow: hidden;
+    }
+
+    
+
+    
+  </style>
+
+  <div class="content">
+    <div class="container">
+      <div class="profile-container mb-4">
+        <form action="/protected/profile-update" method="POST" enctype="multipart/form-data">
+          <img src="<%= user.profilePicture ? user.profilePicture : 'https://www.gravatar.com/avatar/?d=mp' %>"
+            alt="Profile" class="profile-img">
+          <input type="file" class="image-input" name="profileImage" style="display: none;" />
+          <div class="edit-btn image-label">
+            <i class='bx bx-edit'></i>
+          </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="firstName">First Name</label>
+          <input type="text" class="form-control" id="firstName" name="firstName" value="<%= user.firstName %>">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="lastName">Last Name</label>
+          <input type="text" class="form-control" id="lastName" name="lastName" value="<%= user.lastName %>">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="phoneNumber">Phone Number</label>
+          <input type="text" class="form-control" id="phoneNumber" name="phone"
+            value="<%= user.phone ? user.phone: 'Update your Phone' %>">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="email">Email</label>
+          <input type="email" class="form-control" id="email" name="email" value="<%= user.email %>">
+        </div>
+      </div>
+      <a href="/auth/forgot-password" class="btn btn-light">Change Password</a>
+      <button class="btn btn-dark">Update Profile</button>
+      </form>
+
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <strong>Saved Addresses</strong>
+        <button class="btn btn-dark" onclick='openAddressModal("add")'>
+          + Add new Address
+        </button>
+      </div>
+      <hr>
+      <% if (user.addresses.length> 0) { %>
+        <% user.addresses.forEach((address, index)=> { %>
+          <div class="profile-card shadow-sm">
+            <div class="row">
+              <div class="col-md-7">
+                <div class="profile-info">
+                  <strong>
+                    <%= address.fName %>
+                      <%= address.lName %>
+                  </strong> <span class="address-type ms-3 px-1">
+                    <%= address.type %>
+                  </span>
+                  <p class="m-1">
+                    <%= address.houseName %>, <%= address.area %>, <%= address.city %>, <%= address.postcode %>
+                  </p>
+                  <p class="phone m-1"><%= address.contactNo %></p>
+                </div>
+              </div>
+              <div class="col-md-5 d-flex align-items-center justify-content-end">
+                <div class="profile-actions">
+                  <button class="btn btn-light" onclick='openAddressModal("edit", <%= JSON.stringify(address) %>)'>
+                    <i class="bx bx-edit"></i> Edit
+                  </button>
+                  <form id="deleteAddressForm_<%= address._id %>" action="/protected/delete-address/<%= address._id %>" method="POST">
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" onclick="setAddressId('<%= address._id %>')">
+                      <i class="bx bx-trash"></i> Delete
+                    </button>
+                  </form>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+
+            <% } else { %>
+              <P>No address found</P>
+              <% } %>
+    </div>
+  </div>
+
+  <!-- Modal for Image Cropping -->
+  <div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true">
+    <div class="modal-dialog custom-md">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="img-container">
+            <img id="imageToCrop" src="" alt="Image to crop" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-dark" id="cropImageBtn">
+            Crop
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Add address modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <p class="modal-title" id="addressModalLabel"></p>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addressForm" action="/protected/add-new-address" method="POST">
+          <input type="hidden" id="addressId" name="addressId" value="" />
+
+          <div class="mb-2">
+            <div class="radio-group">
+              <label>Type of Address<span class="required-star">*</span></label><br>
+              <input type="radio" id="home" name="type" value="Home" required>
+              <label for="home" class="radio-label">
+                <i class="fas fa-home"></i> Home
+              </label>
+
+              <input type="radio" id="work" name="type" value="Work" required>
+              <label for="work" class="radio-label">
+                <i class="fas fa-building"></i> Work
+              </label>
+            </div>
+            <div id="addressTypeError" class="error-message"></div>
+          </div>
+
+          <div class="mb-2 position-relative">
+            <label for="fName">First Name<span class="required-star">*</span></label>
+            <input type="text" class="form-control" id="fName" name="fName" placeholder=" " data-required="true"/>
+            <div id="fNameError" class="error-message"></div>
+          </div>
+
+          <div class="mb-2 position-relative">
+            <label for="lName">Last Name<span class="required-star">*</span></label>
+            <input type="text" class="form-control" id="lName" name="lName" placeholder=" " data-required="true"/>
+            <div id="lNameError" class="error-message"></div>
+          </div>
+
+          <div class="mb-2 position-relative">
+            <label for="contactNo">Contact Number<span class="required-star">*</span></label>
+            <input type="text" class="form-control" id="contactNo" name="contactNo" placeholder=" " data-required="true"/>
+            <div id="contactNoError" class="error-message"></div>
+          </div>
+
+          <div class="mb-2 position-relative">
+            <label for="houseName">House Name, Flat No, Building<span class="required-star">*</span></label>
+            <input type="text" class="form-control" id="houseName" name="houseName" placeholder=" " data-required="true"/>
+            <div id="houseNameError" class="error-message"></div>
+          </div>
+
+          <div class="mb-2 position-relative">
+            <label for="area">Area, Street, Village<span class="required-star">*</span></label>
+            <input type="text" class="form-control" id="area" name="area" placeholder=" " data-required="true"/>
+            <div id="areaError" class="error-message"></div>
+          </div>
+
+          <div class="mb-2 position-relative">
+            <label for="landmark">Landmark</label>
+            <input type="text" class="form-control" id="landmark" name="landmark" placeholder=" "/>
+          </div>
+
+          <div class="mb-2 position-relative">
+            <label for="postcode">Postcode<span class="required-star">*</span></label>
+            <input type="text" class="form-control" id="postcode" name="postcode" placeholder=" " data-required="true"/>
+            <div id="postcodeError" class="error-message"></div>
+          </div>
+
+          <div class="mb-2 position-relative">
+            <label for="city">City<span class="required-star">*</span></label>
+            <input type="text" class="form-control" id="city" name="city" placeholder=" " data-required="true"/>
+            <div id="cityError" class="error-message"></div>
+          </div>
+
+          <div class="mb-2 position-relative">
+            <label for="state">State<span class="required-star">*</span></label>
+            <input type="text" class="form-control" id="state" name="state" placeholder=" " data-required="true"/>
+            <div id="stateError" class="error-message"></div>
+          </div>
+
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="isDefault" name="isDefault" />
+            <label class="form-check-label" for="isActive">Use this as my default address</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer justify-content-start">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-dark" onclick="submitForm()">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this address?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="submitDeleteForm()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.addEventListener("click", function (event) {
+        const label = event.target.closest(".image-label");
+        if (label) {
+          const fileInput = label.previousElementSibling;
+          if (fileInput && fileInput.type === 'file') {
+            fileInput.click();
+          }
+        }
+      });
+      // Open Cropper Modal when an image is selected
+      document.addEventListener("change", function (event) {
+        if (event.target.matches('input[type="file"]')) {
+          const files = event.target.files;
+          if (files && files.length > 0) {
+            currentImageInput = event.target;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              document.getElementById("imageToCrop").src = e.target.result;
+              const cropperModal = new bootstrap.Modal(
+                document.getElementById("cropperModal")
+              );
+              cropperModal.show();
+            };
+            reader.readAsDataURL(files[0]);
+          }
+        }
+      });
+
+      // Initialize CropperJS when the modal is shown
+      document
+        .getElementById("cropperModal")
+        .addEventListener("shown.bs.modal", function () {
+          const image = document.getElementById("imageToCrop");
+          cropper = new Cropper(image, {
+            aspectRatio: 1, // Adjust aspect ratio as needed
+            viewMode: 1,
+          });
+        });
+
+      // Destroy CropperJS when the modal is hidden
+      document
+        .getElementById("cropperModal")
+        .addEventListener("hidden.bs.modal", function () {
+          cropper.destroy();
+          cropper = null;
+        });
+
+      // Handle image cropping
+      document
+        .getElementById("cropImageBtn")
+        .addEventListener("click", function () {
+          const canvas = cropper.getCroppedCanvas({
+            width: cropper.getImageData().naturalWidth * 2,
+            height: cropper.getImageData().naturalHeight * 2,
+          });
+
+          canvas.toBlob(function (blob) {
+            const newFile = new File([blob], currentImageInput.files[0].name, {
+              type: "image/jpeg",
+            });
+
+            // Replace the current file input with the cropped image
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(newFile);
+            currentImageInput.files = dataTransfer.files;
+
+            // Show the cropped image in the preview
+            const previewImage =
+              currentImageInput.parentNode.querySelector(".profile-img");
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              previewImage.src = e.target.result; // Update the src with the selected image data
+            };
+
+            reader.readAsDataURL(newFile);
+
+            // Hide the modal
+            const cropperModal = bootstrap.Modal.getInstance(
+              document.getElementById("cropperModal")
+            );
+            cropperModal.hide();
+          }, "image/jpeg");
+        });
+    });
+
+
+    document.getElementById("addressForm").addEventListener("submit", function (event) {
+    // Prevent form submission for validation
+    event.preventDefault();
+
+    // Clear previous error messages
+    document.querySelectorAll(".error-message").forEach(function (el) {
+        el.textContent = "";
+    });
+    document.querySelectorAll(".is-invalid").forEach(function (el) {
+        el.classList.remove("is-invalid");
+    });
+
+    // Perform validation checks
+    let isValid = true;
+
+    // Validate radio buttons (address type)
+    const addressType = document.querySelector('input[name="type"]:checked');
+    if (!addressType) {
+        isValid = false;
+        document.getElementById("addressTypeError").textContent = "Please select an address type.";
+    }
+
+    // Validate required text fields
+    const requiredFields = document.querySelectorAll('[data-required="true"]');
+    requiredFields.forEach(function (field) {
+        if (field.value.trim() === "") {
+            isValid = false;
+            field.classList.add("is-invalid");
+            document.getElementById(field.id + "Error").textContent = "This field is required.";
+        }
+    });
+
+    const contactNoField = document.getElementById("contactNo");
+    const contactNoValue = contactNoField.value.trim();
+    const contactNoPattern = /^[0-9]{10}$/;
+    if (!contactNoPattern.test(contactNoValue)) {
+        isValid = false;
+        contactNoField.classList.add("is-invalid");
+        document.getElementById("contactNoError").textContent = "Please enter a valid contact number.";
+    }
+
+    const postcodeField = document.getElementById("postcode");
+    const postcodeValue = postcodeField.value.trim();
+    const postcodePattern = /^[0-9]{6}$/;
+    if (!postcodePattern.test(postcodeValue)) {
+        isValid = false;
+        postcodeField.classList.add("is-invalid");
+        document.getElementById("postcodeError").textContent = "Please enter a valid postcode.";
+    }
+
+    if (isValid) {
+        event.target.submit();
+    }
+});
+
+function submitForm() {
+    document.getElementById('addressForm').dispatchEvent(new Event('submit'));
+}
+
+
+function openAddressModal(mode, address = null) {
+   const modalLabel = document.getElementById('addressModalLabel');
+   const addressForm = document.getElementById('addressForm');
+   const addressIdInput = document.getElementById('addressId');
+
+   // Reset the form for both Add and Edit actions
+   addressForm.reset();
+   addressIdInput.value = "";
+
+   if (mode === 'edit' && address) {
+     modalLabel.innerHTML = '<strong>Edit Address</strong>';
+     addressForm.action = '/protected/edit-address';
+
+     document.getElementById('fName').value = address.fName;
+     document.getElementById('lName').value = address.lName;
+     document.getElementById('contactNo').value = address.contactNo;
+     document.getElementById('houseName').value = address.houseName;
+     document.getElementById('area').value = address.area;
+     document.getElementById('landmark').value = address.landmark;
+     document.getElementById('postcode').value = address.postcode;
+     document.getElementById('city').value = address.city;
+     document.getElementById('state').value = address.state;
+
+     if (address.type === 'Home') {
+       document.getElementById('home').checked = true;
+     } else if (address.type === 'Work') {
+       document.getElementById('work').checked = true;
+     }
+
+     // Set address ID for editing
+     addressIdInput.value = address._id;
+
+   } else {
+     // Default action for adding a new address
+     modalLabel.innerHTML = '<strong>Add New Address</strong>';
+     addressForm.action = '/protected/add-new-address';
+   }
+
+   const addAddressModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+   addAddressModal.show();
+ }
+
+  </script>
+
+<script>
+  let addressIdToDelete = null;
+
+  function setAddressId(addressId) {
+    console.log(addressId);
+    
+    addressIdToDelete = addressId;
+  }
+
+  function submitDeleteForm() {
+    if (addressIdToDelete) {
+      document.getElementById(`deleteAddressForm_${addressIdToDelete}`).submit();
+    }
+  }
+</script>
+
+  <%- include('../partials/footer') %>

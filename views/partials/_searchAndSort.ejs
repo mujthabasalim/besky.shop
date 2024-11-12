@@ -1,0 +1,110 @@
+<div class="d-flex justify-content-end gap-3">
+  <!-- Search Input -->
+  <input
+    type="text"
+    id="searchInput"
+    placeholder="Search <%= entityName %>..."
+    class="form-control"
+    value="<%= search %>"
+    style="max-width: 200px;"
+  >
+
+  <!-- Filter Dropdown -->
+  <div class="dropdown <%= filters.length > 0 ? 'd-block': 'd-none' %>">
+    <button class="btn btn-light dropdown-toggle" type="button" id="filtersDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+      Filters
+    </button>
+    <ul class="dropdown-menu p-3" aria-labelledby="filtersDropdown">
+      <% filters.forEach((filter) => { %>
+        <li>
+          <label><strong><%= filter.label %></strong></label>
+          <select id="<%= filter.id %>" name="<%= filter.id %>" class="form-select">
+            <option value="">All <%= filter.label %></option>
+            <% filter.options.forEach(option => { %>
+              <option
+                value="<%= option.value %>"
+                <%= filter.selected === option.value || filter.selected === undefined && option.value === "" ? 'selected' : '' %>
+              >
+                <%= option.label %>
+              </option>
+            <% }) %>
+          </select>
+        </li>
+      <% }) %>
+      <li class="mt-3">
+        <button id="clearFiltersButton" class="btn btn-outline-danger w-100">Clear Filters</button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Sort Dropdown -->
+  <select id="sortSelect" class="form-select" style="width: max-content;">
+    <% sortOptions.forEach(option => { %>
+      <option
+        value="<%= option.value %>"
+        <%= sort === option.value ? 'selected' : '' %>
+      >
+        <%= option.label %>
+      </option>
+    <% }) %>
+  </select>
+</div>
+
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const entityName = "<%= entityName %>";
+    
+    const fetchDataList = async (page = 1) => {
+      const searchInput = document.getElementById('searchInput');
+      const sortSelect = document.getElementById('sortSelect');
+      const filters = {};
+
+      // Fetch selected filter values from the dropdowns
+      document.querySelectorAll('select.form-select').forEach(select => {
+        filters[select.name] = select.value;
+      });
+
+      const searchQuery = searchInput.value;
+      const sortOption = sortSelect.value;
+
+      // Build the query string with search, sort, filter, and page values
+      const filterQuery = Object.keys(filters)
+        .map(key => `${key}=${encodeURIComponent(filters[key])}`)
+        .join('&');
+
+      const response = await fetch(`/admin/${entityName}?page=${page}&search=${searchQuery}&sort=${sortOption}&${filterQuery}`);
+      const html = await response.text();
+
+      // Update the data section with new HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      const newDataSection = tempDiv.querySelector(`#${entityName}DataSection`).innerHTML;
+      document.querySelector(`#${entityName}DataSection`).innerHTML = newDataSection;
+
+      // Re-attach pagination event listeners
+      attachPaginationListeners();
+    };
+
+    // Attach event listeners for search, sort, and filters
+    document.getElementById('searchInput').addEventListener('input', () => fetchDataList());
+    document.getElementById('sortSelect').addEventListener('change', () => fetchDataList());
+    document.querySelectorAll('select.form-select').forEach(select => {
+      select.addEventListener('change', () => fetchDataList());
+    });
+
+    // Attach event listener for pagination buttons
+    const attachPaginationListeners = () => {
+      document.querySelectorAll('.pagination .page-link').forEach(button => {
+        button.addEventListener('click', function () {
+          const page = this.getAttribute('data-page');
+          fetchDataList(page);
+        });
+      });
+    };
+
+    // Initial pagination listeners
+    attachPaginationListeners();
+  });
+</script>
+

@@ -1,0 +1,35 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<style>
+  .coupon-icon {
+      border-radius: 50%;
+      padding: 7px 12px;
+      /* color: #6c757d; */
+  }
+</style>
+
+<div class="content">
+  <div class="container">
+    <h3 class="mb-4">Available coupons</h3>
+    <% if (coupons.length > 0) { %> 
+      <% coupons.forEach(coupon => { %>
+        <div class="row align-items-center border-bottom py-3">
+          <div class="col-1 text-center">
+            <i class="bi bi-ticket-perforated bg-light fs-3 coupon-icon"></i>
+          </div>
+          <div class="col-8">
+              <p class="text-success fw-bold m-0">Grab <%= coupon.discountType === 'Flat' ? 'flat ' + coupon.maxDiscount : 'up to ' + coupon.maxDiscount %> off</p>
+          </div>
+          <div class="col-3 text-end">
+              <p class="text-secondary m-0" style="font-size: 12px;">Valid till: <%= coupon.endDate.toLocaleDateString() %></p>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No Coupon available</p>
+    <% } %>    
+</div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,40 @@
+<link rel="stylesheet" href="/public/css/user.css">
+
+
+<div class="sidebar shadow-sm d-none d-lg-block pt-3">
+  <div class="d-flex gap-2 pb-3 ps-4 admin-welcome">
+    <img src="<%= user.profilePicture ? user.profilePicture : 'https://www.gravatar.com/avatar/?d=mp' %>" class="rounded-circle profile-image" alt="">
+    <div>
+      <h5 class="m-0">Hello 👋</h5>
+      <p class="text-muted m-0">
+        <%= user.firstName %>
+      </p>
+    </div>
+  </div>
+  <a id="profile-link" href="/protected/profile"><i class='bx bx-user'></i> Personal Information</a>
+  <a id="orders-link" href="/protected/orders"><i class='bx bx-package'></i> My Orders</a>
+  <a id="wishlist-link" href="/protected/wishlist"><i class='bx bx-heart'></i> My Wishlist</a>
+  <!-- <a id="cards-link" href="/protected/saved-cards"><i class='bx bx-credit-card'></i> Saved Cards</a> -->
+  <a id="wallet-link" href="/protected/wallet"><i class='bx bx-wallet'></i> Wallet</a>
+  <a id="coupons-link" href="/protected/coupons"><i class='bx bx-gift'></i> Coupons</a>
+  <a id="notifications-link" href="/notifications"><i class='bx bx-bell'></i> Notification</a>
+  <a id="settings-link" href="/settings"><i class='bx bx-cog'></i> Settings</a>
+</div>
+
+<script>
+// Sidebar active link management
+const sidebarLinks = document.querySelectorAll('.sidebar a');
+sidebarLinks.forEach(link => {
+  link.addEventListener('click', function () {
+    sidebarLinks.forEach(link => link.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+const currentUrl = window.location.pathname;
+sidebarLinks.forEach(link => {
+  if (link.getAttribute('href') === currentUrl) {
+    link.classList.add('active');
+  }
+});
+</script>

@@ -1,0 +1,53 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+
+<div class="content">
+  <div class="container">
+    <h3 class="mb-4">My Wallet</h3>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <p class="fw-bold m-0">Transaction History</p>
+      <div class="bg-light p-2 rounded">
+        <!-- <p class="m-0 text-center" style="font-size: 12px;">be.sky Balance:</p> -->
+        <div class="d-flex align-items-center justify-content-center">
+          <i class='bx bx-wallet fs-3 me-2'></i> <strong>&#8377;<%= wallet.balance.toFixed(2) %></strong>
+        </div>
+      </div>
+    </div>
+
+    <% if (wallet.transactions.length > 0 ) { %>
+      <% wallet.transactions.forEach(transaction => { %>
+        <div class="d-flex justify-content-between align-items-center border-bottom transaction-item py-3">
+          <div class="d-flex align-items-center">
+            <% if (transaction.type === 'credit') { %>
+              <i class='bx bx-plus-circle bg-light p-2 rounded fs-1 me-3 text-success'></i>
+            <% } else { %>
+              <i class='bx bx-minus-circle bg-light p-2 rounded fs-1 me-3 text-danger'></i>
+            <% } %>
+
+            <div>
+              <div class="d-flex align-items-center">
+                <p class="m-0 fw-bold fs-6"><%= transaction.description %></p>
+                <p class="m-0 ms-2 text-secondary" style="font-size: 12px;">
+                  <%= transaction.createdAt.toLocaleDateString() %> | <%= transaction.createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                </p>
+              </div>
+              <p class="m-0 text-secondary" style="font-size: 12px">
+                Transaction ID: <%= transaction.transactionId %><br>
+                Amount <%= transaction.type %>ed: &#8377;<%= transaction.amount.toFixed(2) %>
+              </p>
+            </div>
+          </div>
+          <div class="<%= transaction.type === 'credit' ? 'success-label': 'danger-label' %> me-3">
+            <%= transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1) %>ed
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No Transaction History Found</p>
+    <% } %>
+  </div>
+</div>
+</div>
+
+<%- include('../partials/footer') %>

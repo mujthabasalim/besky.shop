@@ -33,11 +33,11 @@
 }
 
 .login-btn {
-  padding: var(--8px) var(--16px);
+  padding: var(--4px) var(--16px);
   font-size: var(--16px);
 }
 
-.icon-links .nav-link {
+.icon {
   padding: 0 var(--10px);
   font-size: var(--20px);
 }
@@ -101,7 +101,7 @@
   z-index: 1001;
 }
 
-#sidebar.active {
+#sidebar.show {
   left: 0;
 }
 
@@ -109,7 +109,7 @@
   color: #333;
   text-decoration: none;
   display: block;
-  padding: 15px 20px;
+  padding: 8px 20px;
 }
 
 #sidebar .dropdown-menu {
@@ -120,7 +120,8 @@
   color: white;
 }
 
-.overlay {
+/* Backdrop */
+.backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -131,8 +132,90 @@
   display: none;
 }
 
-.overlay.active {
+.backdrop.show {
   display: block;
+}
+
+.cart-dropdown {
+  position: absolute;
+  top: 67px;
+  right: 0;
+  width: max-content;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  display: none;
+  z-index: 10;
+}
+
+.cart-dropdown.show {
+  display: block;
+  max-width: 300px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.cart-item img {
+  width: 50px;
+}
+
+.icon {
+  cursor: pointer;
+  transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+/* Pointing arrow for the dropdown */
+.cart-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 65px;
+  border-width: 0 10px 10px 10px;
+  border-style: solid;
+  border-color: transparent transparent white transparent;
+  z-index: 11;
+}
+
+.cart-dropdown p {
+ font-size: var(--12px);
+}
+.cart-dropdown .btn{
+ font-size: var(--14px);
+}
+
+.icon:hover {
+  transform: scale(1.2);
+}
+
+/* Badge Style */
+.badge {
+  bottom: 5px;
+  right: -8px;
+  font-style: normal;
+  font-size: 8px;
+  border: 2px solid white;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  animation: badgePop 0.6s ease;
+}
+
+/* Animation for badge */
+@keyframes badgePop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Responsive Adjustments */
@@ -183,30 +266,5 @@
   }
 }
 
-/* Sidebar lg styles */
-.sidebar {
-  position: fixed;
-  top: 6rem;
-  left: 3.125rem;
-  border: 1px solid #ddd;
-}
-.sidebar .admin-welcome {
-  border-bottom: solid 1px #ddd;
-}
-.sidebar a {
-  color: #333;
-  text-decoration: none;
-  display: block;
-  padding: 15px 20px;
-}
-.sidebar a.active {
-  background-color: #000;
-  color: #fff;
-}
-.sidebar a.active:hover {
-  background-color: #000;
-  color: #fff;
-}
-.sidebar a:hover {
-  background-color: #f0f0f0;
-}
+
+

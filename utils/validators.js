@@ -28,7 +28,20 @@ const loginValidator = [
   check('password', 'Password is required').exists(),
 ]
 
+const resetValidator = [
+  check('password')
+    .isStrongPassword({
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1
+    })
+    .withMessage('Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters')
+]
+
 module.exports = {
   userValidationRules,
-  loginValidator
+  loginValidator,
+  resetValidator
 };

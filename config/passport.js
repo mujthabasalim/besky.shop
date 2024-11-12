@@ -12,14 +12,18 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // Find existing user
         let user = await User.findOne({ googleId: profile.id });
 
         if (user) {
           return done(null, user);
         }
+        user = await User.findOne({ email: profile.emails[0].value });
 
-        // Create a new user if not found
+        if (user) {
+          user.googleId = profile.id;
+          await user.save();
+          return done(null, user);
+        }
         user = new User({
           googleId: profile.id,
           firstName: profile.name.givenName,
@@ -36,12 +40,10 @@ passport.use(
   )
 );
 
-// Serialize user to session
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// Deserialize user from session
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);

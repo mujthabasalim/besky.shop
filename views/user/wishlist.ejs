@@ -1,0 +1,90 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content">
+  <div class="container">
+    <h3 class="mb-4">My Wishlist</h3>
+    <% if (wishlist.products.length > 0) { %>
+      <div class="row"> <!-- Added row to properly layout the cards -->
+        <% wishlist.products.forEach(item => { %>
+          <% const product = item.productId; %> 
+          <% const firstVariant = product.variants[0]; %>
+          <div class="col-6 col-md-3 mb-4">
+            <div class="card shadow-sm product-card">
+              <i class="btn-wishlist bi <%= wishlist.products.some(p => p.productId._id.toString() === product._id.toString()) ? 'bi-heart-fill text-danger' : 'bi-heart' %>" 
+                data-product-id="<%= product._id %>" 
+                data-in-wishlist="<%= wishlist.products.some(p => p.productId._id.toString() === product._id.toString()) ? 'true' : 'false' %>" 
+                style="cursor: pointer;"></i>
+
+              <a href="/product/<%= product._id %>/0" class="text-decoration-none text-dark"> <!-- Link to the first variant -->
+                <% if (firstVariant && firstVariant.images.length > 0) { %>
+                  <img src="<%= firstVariant.images[0] %>" class="product-img card-img-top" alt="<%= product.name %>">
+                <% } %>
+                <div class="card-body">
+                  <p class="card-title mb-1"><strong><%= product.brand %></strong></p>
+                  <p class="card-title mb-0"><%= product.name %> <%= firstVariant ? firstVariant.color : '' %></p>
+                  <p class="card-text m-0">
+                    &#8377;<%= product.discountedPrice.toFixed(2) %>
+                    <% if (product.discountedPrice < product.price) { %>
+                      <del class="text-secondary ms-2">&#8377;<%= product.price.toFixed(2) %></del>
+                      <span class="text-danger ms-2">
+                        (Save <%= ((product.price - product.discountedPrice) / product.price * 100).toFixed(0) %>%)
+                      </span>
+                    <% } %>
+                  </p>
+                </div>
+              </a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p>Your wishlist is empty.</p>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.btn-wishlist').forEach(heartIcon => {
+    heartIcon.addEventListener('click', async function() {
+      const productId = this.dataset.productId;
+      const isInWishlist = this.dataset.inWishlist === 'true';
+
+      try {
+        const response = await fetch(`/protected/wishlist/${isInWishlist ? 'remove' : 'add'}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ productId })
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          // Toggle the wishlist status
+          this.dataset.inWishlist = isInWishlist ? 'false' : 'true';
+          
+          // Update the class and color based on the new status
+          if (isInWishlist) {
+            // Remove from wishlist: switch to bi-heart and black color
+            this.classList.remove('bi-heart-fill');
+            this.classList.add('bi-heart');
+            this.style.color = 'black';
+          } else {
+            // Add to wishlist: switch to bi-heart-fill and red color
+            this.classList.remove('bi-heart');
+            this.classList.add('bi-heart-fill');
+            this.style.color = 'red';
+          }
+        } else {
+          createToast(result.message, 'error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        createToast('Failed to update wishlist','error')
+      }
+    });
+  });
+</script>
+
+<%- include('../partials/footer') %>

@@ -13,6 +13,8 @@
   <link
   href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet"/>
 
+  
+
   <!-- box icons   -->
   <link href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/public/css/style.css">
@@ -21,43 +23,63 @@
 </head>
 
 <body>
+<style>
+  .search-input {
+    border-radius: 5px;
+    margin-right: -37px;
+    padding: 0 32px 0 8px;
+    outline: none;
+    border: none;
+    width: 0px;
+    transition: width 0.4s ease, box-shadow 0.4s ease;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+  }
 
-  <!-- Loading Animation Container -->
-  <div id="loading">
-    <div class="spinner"></div>
-    <p>Loading...</p>
+  .search-area:hover .search-input {
+    width: 200px;
+    opacity: 1;
+  }
+
+</style>
+<!-- Loading Animation Container -->
+<div id="loading">
+  <div class="logo-container">
+    <h1 class="logo">BE.SKY</h1>
   </div>
+</div>
 
-  <!-- Overlay -->
-  <div id="overlay" class="overlay"></div>
+<div id="content" style="display: none;"></div>
 
-  <div id="content" style="display: none"></div>
+  <!-- Backdrop -->
+  <div class="backdrop" id="backdrop"></div>
 
   <!-- Sidebar -->
   <div id="sidebar">
     <button type="button" class="btn-close btn-close-dark" aria-label="Close" id="sidebarClose"></button>
     <ul class="nav flex-column">
       <li class="nav-item">
-        <a href="/admin/dashboard"><i class='bx bx-grid-alt'></i> Dashboard</a>
+        <a href="/admin/dashboard"> Dashboard</a>
       </li>
       <li class="nav-item">
-        <a href="/admin/users"><i class='bx bx-user'></i> Users</a>
+        <a href="/admin/users"> Users</a>
       </li>
       <li class="nav-item">
-        <a href="/admin/categories"><i class='bx bx-category'></i> Categories</a>
+        <a href="/admin/categories">Categories</a>
       </li>
       <li class="nav-item">
-        <a href="/admin/products"><i class='bx bx-box'></i> Products</a>
+        <a href="/admin/products"> Products</a>
       </li>
       <li class="nav-item">
-        <a href="/admin/orders"><i class='bx bx-cart'></i> Orders</a>
+        <a href="/admin/orders"> Orders</a>
       </li>
       <li class="nav-item">
-        <a href="/admin/coupons"><i class='bx bxs-coupon'></i> Coupons</a>
+        <a href="/admin/coupons"> Coupons</a>
       </li>
-      <a href="/admin/offers"><i class='bx bx-gift'></i> Offers</a>
+      <a href="/admin/offers"> Offers</a>
+      <a href="/admin/notifications"> Notification</a>
       <li class="nav-item">
-        <a href="/admin/settings"><i class='bx bx-cog'></i> Settings</a>
+        <a href="/admin/settings"> Settings</a>
       </li>
     </ul>
   </div>
@@ -69,13 +91,17 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <a class="navbar-brand" href="#">BE.SKY</a>
-      <div class="collapse navbar-collapse justify-content-center" id="navbarNav"></div>
-      <div class="icon-links d-none d-lg-flex">
-        <a class="nav-link" href="#"><i class="bi bi-search"></i></a>
-        <a class="nav-link" href="#"><i class="bi bi-heart"></i></a>
-        <a class="nav-link" href="#"><i class="bi bi-cart"></i></a>
-      </div>
 
+      <div class="d-flex">
+      <div class="icon-links d-none d-lg-flex">
+        <div class="d-flex search-area">
+          <form action="#" method="GET" class="d-flex">
+            <input type="text" name="query" class="search-input" placeholder="Search...">
+            <button type="submit" class="nav-link icon search-icon"><i class="bi bi-search"></i></button>
+          </form>          
+        </div>
+        <a class="nav-link icon" href="/admin/notifications"><i class="bi bi-bell"></i></a>
+      </div>
       <div class="dropdown">
         <a class="btn border-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           <i class='bx bx-user profile'></i>
@@ -108,6 +134,7 @@
         </ul>
       </div>
     </div>
+    </div>
   </nav>
 
 <!-- side bar -->
@@ -123,10 +150,11 @@
   <a id="users-link" href="/admin/users"><i class='bx bx-user'></i> User Management</a>
   <a id="categories-link" href="/admin/categories"><i class='bx bx-category'></i> Category Management</a>
   <a id="products-link" href="/admin/products"><i class='bx bx-box'></i> Product Management</a>
-  <a id="orders-link" href="#"><i class='bx bx-cart'></i> Order Management</a>
-  <a id="coupons-link" href="#"><i class='bx bxs-coupon'></i> Coupon Management</a>
-  <a id="offers-link" href="#"><i class='bx bx-gift'></i> Offer Management</a>
-  <a id="settings-link" href="#"><i class='bx bx-cog'></i> Settings</a>
+  <a id="orders-link" href="/admin/orders"><i class='bx bx-cart'></i> Order Management</a>
+  <a id="coupons-link" href="/admin/coupons"><i class='bx bxs-coupon'></i> Coupon Management</a>
+  <a id="offers-link" href="/admin/offers"><i class='bx bx-gift'></i> Offer Management</a>
+  <a id="notifications" href="/admin/notifications"><i class='bx bx-bell'></i> Notification
+  <a id="settings-link" href="/admin/settings"><i class='bx bx-cog'></i> Settings</a>
 </div>
 
 <script>

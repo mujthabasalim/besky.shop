@@ -1,4 +1,641 @@
 <%- include('../partials/adminHeader') -%>
 
 
+
+  <style>
+    .card-custom {
+      border: none;
+      border-radius: 5px;
+      padding: 20px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    .icon-box {
+      font-size: 1.5rem;
+      padding: 10px 15px;
+      border-radius: 50%;
+    }
+
+    .icon-blue {
+      background-color: #eaf5ff;
+      color: #007bff;
+    }
+
+    .icon-green {
+      background-color: #eafcf0;
+      color: #28a745;
+    }
+
+    .icon-purple {
+      background-color: #f3e5ff;
+      color: #6f42c1;
+    }
+
+    .icon-red {
+      background-color: #fdefed;
+      color: #dc3545;
+    }
+
+    .line-chart {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(90deg, rgba(255, 91, 91, 0.5) 0%, rgba(91, 186, 255, 0.5) 100%);
+      border-radius: 12px;
+      position: relative;
+      margin-top: 20px;
+    }
+
+    .line-chart span {
+      position: absolute;
+      top: 40%;
+      left: 45%;
+      background-color: #000;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 5px;
+    }
+
+    .small-card {
+      flex: 1;
+      min-width: 200px;
+    }
+
+
+    .custom-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-button {
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dropdown-button i {
+      font-size: 1.2rem;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #fff;
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 1;
+      width: 200px;
+    }
+
+    .custom-dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .dropdown-header {
+      font-weight: bold;
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .divider {
+      height: 1px;
+      background-color: #ccc;
+      margin: 10px 0;
+    }
+
+    .dropdown-content ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .dropdown-content ul li {
+      padding: 8px 0;
+      cursor: pointer;
+    }
+
+    .dropdown-content ul li:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+
+  <div class="content">
+    <div class="d-flex justify-content-between align-items-center heading">
+      <h2>Overview</h2>
+    </div>
+
+    <div class="col-12 mb-4">
+      <div class="d-flex justify-content-between flex-wrap mb-3 gap-3">
+        <!-- Revenue Card -->
+        <div class="small-card ms-0">
+          <div class="card card-custom">
+            <div class="d-flex align-items-center">
+              <div class="icon-box icon-blue">
+                <i class="bi bi-currency-rupee"></i>
+              </div>
+              <div class="ms-3">
+                <strong>Revenue</strong>
+                <h3 class="mb-0" id="revenue">&#8377;0.00</h3>
+                <small>Revenue of this period</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders Card -->
+        <div class="small-card">
+          <div class="card card-custom">
+            <div class="d-flex align-items-center">
+              <div class="icon-box icon-green">
+                <i class="bi bi-truck"></i>
+              </div>
+              <div class="ms-3">
+                <strong>Orders</strong>
+                <h3 class="mb-0" id="total-orders">0</h3>
+                <small>Orders of this period</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Discounts Card -->
+        <div class="small-card">
+          <div class="card card-custom">
+            <div class="d-flex align-items-center">
+              <div class="icon-box icon-purple">
+                <i class="bi bi-percent"></i>
+              </div>
+              <div class="ms-3">
+                <strong>Discount</strong>
+                <h3 class="mb-0" id="total-discounts">&#8377;0.00</h3>
+                <small>Discount of this period</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="small-card best-seller-card me-0" style="cursor: pointer;">
+          <div class="card card-custom">
+            <div class="d-flex align-items-center">
+              <div class="icon-box icon-red">
+                <i class="bi bi-box-seam"></i>
+              </div>
+              <div class="ms-3">
+                <strong>Best Sellers</strong>
+                <h3 class="mb-0" id="top-tens">10</h3>
+                <small>Products, Categories</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dropdown and Date Range Filter -->
+    <div class="card card-custom mb-3">
+      <div class="d-flex justify-content-between align-items-end mb-3">
+        <div class="d-flex align-items-end gap-3">
+          <!-- Predefined Periods Dropdown -->
+          <div class="custom-dropdown">
+            <select id="timeFilter" class="form-select" onchange="handleTimeFilterChange()">
+              <option value="daily">Today</option>
+              <option value="weekly">This Week</option>
+              <option value="monthly" selected>This Month</option>
+              <option value="yearly">This Year</option>
+            </select>
+          </div>
+
+          <!-- Custom Date Range Picker -->
+          <!-- <div class="custom-dropdown d-flex"> -->
+          <div>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" class="form-control" onchange="handleCustomDateRangeChange()" />
+          </div>
+          <div>
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" class="form-control" onchange="handleCustomDateRangeChange()" />
+          </div>
+          <!-- </div> -->
+        </div>
+        <div><i class="bi bi-bar-chart-fill"></i></i></div>
+
+
+      </div>
+      <!-- ApexChart Container -->
+      <div id="chart" class="py-3 w-100"></div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="card shadow-sm p-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong>Sales Report</strong>
+            <div class="d-flex justify-content-end mb-3">
+              <button id="pdfBtn" class="btn btn-outline-danger me-2"><i class="bi bi-file-earmark-pdf"></i></button>
+              <button id="excelBtn" class="btn btn-outline-success"><i
+                  class="bi bi-file-earmark-spreadsheet"></i></button>
+            </div>
+          </div>
+
+          <!-- Orders Table -->
+          <div id="ordersDataSection">
+            <div class="table-wrapper">
+              <table class="table text-center">
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-start">Order ID</th>
+                    <th scope="col">No. of Items</th>
+                    <th scope="col">Payment Method</th>
+                    <th scope="col">Payment Status</th>
+                    <th scope="col">Discount</th>
+                    <th scope="col">Grand Total</th>
+                    <th scope="col">Order Date</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="salesReportTableBody">
+                  <!-- Orders will be dynamically populated here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card shadow-sm p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <strong>Resend Transaction</strong>
+          </div>
+
+          <!-- Orders Table -->
+          <div id="transactionDataSection">
+            <div class="table-wrapper">
+              <table class="table text-center">
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-start">Name</th>
+                    <th scope="col">Method</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionTableBody">
+                  <!-- Orders will be dynamically populated here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Modal for Top Ten Best Sellers -->
+  <div class="modal fade" id="topTenModal" tabindex="-1" aria-labelledby="topTenModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="topTenModalLabel">Top 10 Best Sellers</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h6>Top Selling Products</h6>
+          <table class="table text-center" id="topProductsTable">
+            <thead>
+              <tr>
+                <th scope="col" class="text-start">Product Name</th>
+                <th scope="col">Brand</th>
+                <th scope="col">Sold</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <h6>Top Selling Categories</h6>
+          <table class="table text-center" id="topCategoriesTable">
+            <thead>
+              <tr class="align-middle">
+                <th scope="col" class="text-start">Sub Category</th>
+                <th scope="col">Parent Category</th>
+                <th scope="col">Sold</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
   <%- include('../partials/adminFooter') -%>
+
+    <!-- ApexCharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Moment.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+    <script>
+
+      async function updateChart(orders) {
+        const selectedOption = document.getElementById('timeFilter').value;
+        const salesData = { labels: [], counts: [], revenue: [] };
+
+        switch (selectedOption) {
+          case 'daily':
+            for (let hour = 0; hour < 24; hour++) {
+              const startHour = moment().startOf('day').add(hour, 'hours');
+              const endHour = moment(startHour).endOf('hour');
+              salesData.labels.push(startHour.format('HH:mm'));
+
+              const hourlyOrders = orders.filter(order =>
+                moment(order.createdAt).isBetween(startHour, endHour)
+              );
+              salesData.counts.push(hourlyOrders.length);
+              salesData.revenue.push(hourlyOrders.reduce((total, order) => total + order.grandTotal, 0));
+            }
+            break;
+
+          case 'weekly':
+            const weekStart = moment().startOf('isoWeek');
+            for (let i = 0; i < 7; i++) {
+              const day = moment(weekStart).add(i, 'days');
+              salesData.labels.push(day.format('dddd'));
+
+              const dailyOrders = orders.filter(order => moment(order.createdAt).isSame(day, 'day'));
+              salesData.counts.push(dailyOrders.length);
+              salesData.revenue.push(dailyOrders.reduce((total, order) => total + order.grandTotal, 0));
+            }
+            break;
+
+          case 'monthly':
+            const monthStart = moment().startOf('month');
+            for (let i = 0; i < 4; i++) {
+              const weekStart = moment(monthStart).add(i, 'weeks');
+              const weekEnd = moment(weekStart).endOf('week');
+              salesData.labels.push(`Week ${i + 1}`);
+
+              const weeklyOrders = orders.filter(order => moment(order.createdAt).isBetween(weekStart, weekEnd, 'day', '[]'));
+              salesData.counts.push(weeklyOrders.length);
+              salesData.revenue.push(weeklyOrders.reduce((total, order) => total + order.grandTotal, 0));
+            }
+            break;
+
+          case 'yearly':
+            const yearStart = moment().startOf('year');
+            for (let month = 0; month < 12; month++) {
+              const monthStart = moment(yearStart).add(month, 'months');
+              salesData.labels.push(monthStart.format('MMMM'));
+
+              const monthlyOrders = orders.filter(order => moment(order.createdAt).isSame(monthStart, 'month'));
+              salesData.counts.push(monthlyOrders.length);
+              salesData.revenue.push(monthlyOrders.reduce((total, order) => total + order.grandTotal, 0));
+            }
+            break;
+        }
+
+        chart.updateOptions({
+          series: [
+            { name: 'Order Count', data: salesData.counts },
+            { name: 'Revenue', data: salesData.revenue }
+          ],
+          xaxis: { categories: salesData.labels }
+        });
+      }
+
+      // Options for ApexCharts setup
+      const options = {
+        series: [
+          { name: 'Order Count', data: [] }, // Order Count data will be added dynamically
+          { name: 'Revenue', data: [] } // Revenue data will be added dynamically
+        ],
+        chart: {
+          height: 350,
+          type: 'area',
+          animations: {
+            enabled: true,
+            easing: 'easein',
+            speed: 800,
+            animateGradually: {
+              enabled: true,
+              delay: 150
+            },
+            dynamicAnimation: {
+              enabled: true,
+              speed: 350
+            }
+          }
+        },
+        colors: ['#CED4DC', '#000000'],
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth' },
+        xaxis: { categories: [] },
+        yaxis: [
+          {
+            title: { text: 'Order Count' },
+            labels: { style: { colors: '#CED4DC' } },
+            opposite: false
+          },
+          {
+            title: { text: 'Revenue' },
+            labels: { style: { colors: '#000000' } },
+            opposite: true
+          }
+        ],
+        tooltip: { x: { format: 'dd/MM/yy HH:mm' } },
+        grid: { show: false },
+      };
+
+      const chart = new ApexCharts(document.querySelector("#chart"), options);
+      chart.render();
+
+
+
+      async function fetchSalesReport(urlParams) {
+        try {
+          const response = await fetch(urlParams);
+          const data = await response.json();
+
+          if (data.success) {
+            const { orders, salesReport } = data;
+            updateDashboard(salesReport);
+            updateTable('salesReport', orders);
+            updateTable('transaction', orders);
+            updateChart(orders);
+          } else {
+            alert('Failed to fetch sales report.');
+          }
+        } catch (error) {
+          console.error('Error fetching sales report:', error);
+          alert('An error occurred while fetching the sales report.');
+        }
+      }
+
+      // Function to handle predefined time period filter changes
+      async function handleTimeFilterChange() {
+        const selectedOption = document.getElementById('timeFilter').value;
+        fetchSalesReport(`/admin/sales-report?period=${selectedOption}`);
+      }
+
+      // Function to handle custom date range filter changes
+      async function handleCustomDateRangeChange() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+          alert('Please select a valid date range.');
+          return;
+        }
+
+        fetchSalesReport(`/admin/sales-report?startDate=${startDate}&endDate=${endDate}`);
+      }
+
+      // Event listeners for filter changes
+      document.getElementById('timeFilter').addEventListener('change', handleTimeFilterChange);
+      document.getElementById('startDate').addEventListener('change', handleCustomDateRangeChange);
+      document.getElementById('endDate').addEventListener('change', handleCustomDateRangeChange);
+
+      document.getElementById('pdfBtn').addEventListener('click', () => {
+        const selectedOption = document.getElementById('timeFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        window.location.href = selectedOption
+          ? `/admin/sales-report/download/pdf?period=${selectedOption}`
+          : `/admin/sales-report/download/pdf?startDate=${startDate}&endDate=${endDate}`;
+      });
+
+      document.getElementById('excelBtn').addEventListener('click', () => {
+        const selectedOption = document.getElementById('timeFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        window.location.href = selectedOption
+          ? `/admin/sales-report/download/excel?period=${selectedOption}`
+          : `/admin/sales-report/download/excel?startDate=${startDate}&endDate=${endDate}`;
+      });
+
+      // Function to update the UI with the fetched summary data
+      function updateDashboard(salesReport) {
+        const report = salesReport[0] || { totalSalesAmount: 0, totalOrders: 0, totalDiscounts: 0, totalShipping: 0 };
+
+        document.getElementById('revenue').textContent = `\u20B9${report.totalSalesAmount.toFixed(2)}`;
+        document.getElementById('total-orders').textContent = report.totalOrders;
+        document.getElementById('total-discounts').textContent = `\u20B9${report.totalDiscounts.toFixed(2)}`;
+        // document.getElementById('total-shipping').textContent = `\u20B9${report.totalShipping.toFixed(2)}`;
+      }
+
+      // Generic function to update any table with order data
+      function updateTable(tableType, orders) {
+        let tableBody;
+
+        if (tableType === 'salesReport') {
+          tableBody = document.querySelector("#salesReportTableBody");
+        } else if (tableType === 'transaction') {
+          tableBody = document.querySelector("#transactionTableBody");
+        } else {
+          console.error("Invalid table type");
+          return;
+        }
+
+        // Clear existing rows
+        tableBody.innerHTML = '';
+
+        if (orders.length === 0) {
+          const emptyMessage = tableType === 'salesReport'
+            ? '<tr><td colspan="8">No orders found for the selected period.</td></tr>'
+            : '<tr><td colspan="5">No transactions found for the selected period.</td></tr>';
+          tableBody.innerHTML = emptyMessage;
+          return;
+        }
+
+        // Populate table with order data based on table type
+        orders.forEach(order => {
+          const row = document.createElement("tr");
+          row.classList.add("align-middle", "table-row");
+
+          if (tableType === 'salesReport') {
+            row.innerHTML = `
+            <td class="text-start"><a href="/admin/orders?orderId=${order._id}" target="_blank">${order._id}</a></td>
+            <td>${order.items.length}</td>
+            <td>${capitalizeFirstLetter(order.paymentMethod)}</td>
+            <td>${capitalizeFirstLetter(order.paymentStatus)}</td>
+            <td>&#8377;${order.couponDiscount || 0}</td>
+            <td>&#8377;${order.grandTotal.toFixed(2)}</td>
+            <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+            <td>${capitalizeFirstLetter(order.orderStatus)}</td>
+            `;
+          } else if (tableType === 'transaction') {
+            row.innerHTML = `
+            <td class="text-start">${order.userId.firstName}</td>
+            <td>${capitalizeFirstLetter(order.paymentMethod)}</td>
+            <td>&#8377;${order.grandTotal.toFixed(2)}</td>
+            <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+            <td>${capitalizeFirstLetter(order.paymentStatus)}</td>
+            `;
+          }
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Initial call to load data based on the selected time filter
+      handleTimeFilterChange();
+
+
+    </script>
+
+    <script>
+      // JavaScript to fetch and display data
+      document.querySelector('.best-seller-card').addEventListener('click', async () => {
+        try {
+          const response = await fetch('/admin/best-selling');
+          const data = await response.json();
+
+          // Populate Products Table
+          const productsTableBody = document.getElementById('topProductsTable').querySelector('tbody');
+          productsTableBody.innerHTML = data.topProducts
+            .map(product => `
+          <tr>
+            <td class="text-start">${product.productDetails.name}</td>
+            <td>${product.productDetails.brand}</td>
+            <td>${product.totalSold}</td>
+          </tr>
+        `)
+            .join('');
+
+          // Populate Categories Table
+          const categoriesTableBody = document.getElementById('topCategoriesTable').querySelector('tbody');
+          categoriesTableBody.innerHTML = data.topCategories
+            .map(category => `
+          <tr>
+            <td class="text-start">${category.subCategoryDetails.name}</td>
+            <td>${category.parentCategoryDetails.name}</td>
+            <td>${category.totalSold}</td>
+          </tr>
+        `)
+            .join('');
+
+          // Show Modal
+          new bootstrap.Modal(document.getElementById('topTenModal')).show();
+        } catch (error) {
+          console.error('Error fetching top-selling data:', error);
+        }
+      });
+    </script>

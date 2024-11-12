@@ -1,9 +1,156 @@
+
+<style>
+  .brand-logo {
+    font-family: Logo-font;
+  }
+  .features-section p {
+      font-size: 14px;
+  }
+  .footer {
+    position: relative;
+    z-index: 10;
+  }
+  .footer .footer-section {
+      margin-bottom: 30px;
+  }
+  .footer .footer-section a {
+      color: #fff;
+      font-weight: 300;
+      font-size: 14px;
+      text-decoration: none;
+  }
+  .footer .footer-section a:hover {
+      color: #ddd;
+  }
+  .icon-box {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+  }
+  .bottom-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .bottom-footer .image {
+    max-width: 200px;
+  }
+  .image img {
+    width: 100%;
+  }
+</style>
+
+
+<!-- Features Section (Light Background) -->
+<section class="features-section py-5">
+<div class="container">
+  <div class="row text-center text-md-start">
+
+      <div class="col-md-3">
+          <i class='bx bx-cube icon-box fs-1'></i>
+          <h5>Free Shipping</h5>
+          <p>Free Shipping for order above $150</p>
+      </div>
+
+      <div class="col-md-3 footer-section">
+          <i class='bx bx-dollar-circle icon-box fs-1'></i>
+          <h5>Money Guarantee</h5>
+          <p>Within 14 days of Exchange</p>
+      </div>
+
+      <div class="col-md-3 footer-section">
+          <i class='bx bx-headphone icon-box fs-1'></i>
+          <h5>Online Support</h5>
+          <p>24 x 7 Online support</p>
+      </div>
+
+      <div class="col-md-3 footer-section">
+          <i class='bx bx-credit-card icon-box fs-1'></i>
+          <h5>Flexible Payments</h5>
+          <p>Pay with multiple credit cards</p>
+      </div>
+  </div>
 </div>
+</section>
+
+<!-- Footer Section (Dark Background) -->
+<footer class="footer bg-black pt-5">
+<div class="container">
+  <div class="row text-white">
+      <!-- Contact Information -->
+      <div class="col-md-3 footer-section">
+        <a class="brand-logo" style="font-size: 40px;" href="/">BE.SKY</a>
+          <div class="d-flex align-items-center mb-1"><i class='bx bx-phone fs-3'></i><p class="m-0 ms-1"> +91 123456789</p></div>
+          <div class="d-flex align-items-center mb-1"><i class='bx bx-envelope fs-3'></i><p class="m-0 ms-1"> besky@gmail.com</p></div>
+          <div class="d-flex align-items-lg-center"><i class='bx bx bx-map fs-3'></i><p class="m-0 ms-1"> Edappally, Kochi, Ernakulam 673548</p></div>
+      </div>
+      
+      <!-- Information Links -->
+      <div class="col-md-3 footer-section">
+        <p><strong>Information</strong></p>
+        <a href="#">My Account</a><br>
+        <a href="#">Login</a><br>
+        <a href="#">My Cart</a><br>
+        <a href="#">My Wishlist</a><br>
+        <a href="#">Checkout</a>
+      </div>
+      
+      <!-- Service Links -->
+      <div class="col-md-3 footer-section">
+        <p><strong>Service</strong></p>
+        <a href="#">About Us</a><br>
+        <a href="#">Careers</a><br>
+        <a href="#">Delivery Information</a><br>
+        <a href="#">Privacy Policy</a><br>
+        <a href="#">Terms & Conditions</a>
+      </div>
+      
+      <!-- Subscription Form -->
+      <div class="col-md-3 footer-section">
+          <p><strong>Subscribe</strong></p>
+          <p>Enter your email to know about new collections and product launches.</p>
+          <form class="d-flex">
+              <input type="email" class="form-control" placeholder="Your Email">
+              <button class="btn btn-light ms-2" type="submit">
+                  <i class='bx bx-right-arrow-alt'></i>
+              </button>
+          </form>
+      </div>
+  </div>
+
+  <!-- Payment Methods -->
+  <div class="bottom-footer border-top py-2">
+      <div class="image">
+          <img src="/public/assets/Minimal-Credit-Card-Payment-Method-Figma-Icons.jpg" alt="Visa">
+      </div>
+      <div>
+        <i class='bi bi-instagram fs-4' style='color:#ffffff' ></i>
+        <i class="bi bi-twitter-x fs-4" style='color:#ffffff'></i>
+        <i class='bi bi-facebook fs-4' style='color:#ffffff'></i>
+      </div>
+    </div>
+    <!-- Footer Bottom -->
+    <div class="text-white-50 text-center pb-2">
+        © 2024 Be.Sky. All rights reserved
+    </div>
+</div>
+</footer>
+
+
+
+</div>
+
+<!-- Include Cropper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 <script src="/public/js/script.js"></script>
+<script src="/public/js/user.js"></script>
 <script src="/public/js/footer.js"></script>
+<script src="/public/js/toast.js"></script>
 </body>
 </html>

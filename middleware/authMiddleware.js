@@ -3,38 +3,51 @@ const { generateToken, verifyToken } = require('../services/jwtService');
 // Middleware to check if JWT token is valid and update its expiration
 exports.checkToken = (req, res, next) => {
   const token = req.cookies.token;
+  const isProtectedRoute = req.route && req.route.protected;
 
-  if (!token) {
+  // Function to handle token verification
+  const handleToken = (token) => {
+    try {
+      const decoded = verifyToken(token);
+      const now = Math.floor(Date.now() / 1000);
+      const oneDayInSeconds = 24 * 60 * 60;
+
+      // Update token expiration if about to expire
+      if (decoded.exp - now < oneDayInSeconds) {
+        const newToken = generateToken(decoded);
+        res.cookie('token', newToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+      }
+
+      req.user = decoded; // Attach decoded token to request
+    } catch (error) {
+      console.error('Invalid token:', error);
+      res.clearCookie('token'); // Clear the cookie if token is invalid
+      throw new Error('Invalid token');
+    }
+  };
+
+  if (token) {
+    handleToken(token);
+  }
+
+  // Check for protected routes
+  if (isProtectedRoute && !req.user) {
+    // User is not authenticated
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(401).json({ success: false, message: 'Please log in to continue.' });
+    }
     return res.redirect('/auth/login');
   }
 
-  try {
-    const decoded = verifyToken(token);
-
-    // Check if the token is about to expire (within a day)
-    const now = Math.floor(Date.now() / 1000);
-    const oneDayInSeconds = 24 * 60 * 60;
-
-    if (decoded.exp - now < oneDayInSeconds) {
-      // Update the token's expiration
-      const newToken = generateToken(decoded);
-      res.cookie('token', newToken, { httpOnly: true, secure: process.env.NODE_ENV === 'development' });
-    }
-
-    req.user = decoded; // Attach the decoded token to the request
-    next();
-  } catch (error) {
-    console.error('Invalid token:', error);
-    res.redirect('/auth/login');
-  }
+  next();
 };
+
 
 // Middleware to prevent logged-in users from accessing login/register pages
 exports.preventAuthAccess = (req, res, next) => {
   const token = req.cookies.token;
 
   if (token) {
-    console.log('token');
     
     try {
       const decoded = verifyToken(token);
@@ -49,12 +62,6 @@ exports.preventAuthAccess = (req, res, next) => {
       res.clearCookie('token');
     }
   }
-
-  // Store the original URL to redirect back to after login
-  if (!req.session.returnTo) {
-    req.session.returnTo = req.get('Referrer') || '/';
-  }
-
   next();
 };
 
