@@ -103,12 +103,12 @@
           <a href="/settings"> Settings</a>
         </li>
         <hr>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <a class="nav-link" href="#">Blog</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Contact Us</a>
-        </li>
+        </li> -->
       </ul>
     </div>
 
@@ -127,12 +127,12 @@
             <li class="nav-item">
               <a class="nav-link" href="/shop">Shop</a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="#">Blog</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Contact Us</a>
-            </li>
+            </li> -->
           </ul>
         </div>
         <div class="icon-links d-none d-lg-flex">
@@ -157,10 +157,15 @@
               id="cartItemCountMobile"></span>
           </i>
           <% if (token) { %>
-            <div class="dropdown">
-              <a class="btn border-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bx bx-user profile"></i>
-              </a>
+          <div class="dropdown">
+            <a class="btn border-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <% if (profilePicture) { %>
+                <img src="/public/uploads/<%= profilePicture %>" alt="User Profile" class="ms-1 rounded-circle"
+                  width="30" height="30">
+                <% } else { %>
+                  <i class="bx bx-user profile"></i>
+                  <% } %>
+            </a>
               <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 0; border: none">
                 <li>
                   <a class="dropdown-item" href="/protected/profile">

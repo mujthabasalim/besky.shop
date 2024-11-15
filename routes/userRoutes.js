@@ -8,13 +8,12 @@ const upload = require('../config/multer');
 
 router.use((req, res, next) => {
   // Define protected routes
-  if (req.path.startsWith('/protected')) {
+  if (req.path.includes('/protected')) {
     req.route = { protected: true };
   }
   next();
 });
 
-router.use(storeToken)
 router.use(checkToken);
 
 // home routes
@@ -22,8 +21,6 @@ router.get('/', userController.loadHome);
 
 router.get('/shop', userController.loadShop);
 router.get('/product/:productId/:variantIndex', userController.showProduct);
-
-// router.use(checkToken)
 
 // Route for profile
 router.get('/protected/profile', userController.showProfile)

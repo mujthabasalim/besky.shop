@@ -9,7 +9,8 @@ const Wishlist = require("../models/Wishlist");
 const Wallet = require("../models/Wallet");
 const Review = require("../models/Review");
 const { applyHighestDiscount } = require("../utils/discountCalculator");
-const WalletService = require("../services/WalletService");
+const 
+WalletService = require("../services/walletService");
 const { createNotification } = require("../services/notificationService");
 const { generateInvoice } = require("../services/pdfService");
 const Notification = require("../models/Notification");
@@ -244,10 +245,7 @@ exports.updateProfile = async (req, res) => {
 
     let profilePicture = user.profilePicture;
     if (req.file) {
-      profilePicture = req.file.path.replace(
-        "C:\\Users\\YASNA UBAID\\Desktop\\Web development\\be.sky",
-        ""
-      );
+      profilePicture = req.file.filename
     }
 
     const userData = { firstName, lastName, phone, email, profilePicture };
@@ -378,9 +376,6 @@ exports.deleteAddress = async (req, res) => {
 
 const calculateCartSummaryAndValidate = async (userId, couponCode = null) => {
   const cart = await Cart.findOne({ userId }).populate("items.productId");
-  if (!cart || cart.items.length === 0) {
-    throw new Error("Cart is empty.");
-  }
 
   const currentDate = new Date();
   const offers = await Offer.find({
@@ -515,16 +510,20 @@ exports.manageCart = async (req, res) => {
 
   try {
     const userId = req.user.id;
+    const maxQuantity = 3;
 
-    const cart =
-      (await Cart.findOne({ userId })) || new Cart({ userId, items: [] });
+    if (quantity > maxQuantity) {
+      return res.status(400).json({ success: false, message: 'Quantity limit reached.'});
+    }
+
+    const cart = (await Cart.findOne({ userId })) || new Cart({ userId, items: [] });
 
     const product = await Product.findById(productId).select("variants");
     const variant = product.variants.id(variantId);
     const sizeData = variant.sizes.find((s) => s.size === size);
 
     if (!sizeData || sizeData.stock < quantity) {
-      throw new Error("Insufficient stock for the selected size");
+      return res.status(400).json({ success: false, message:"Insufficient stock for the selected size"});
     }
 
     const existingItemIndex = cart.items.findIndex(
@@ -1329,7 +1328,6 @@ exports.showWallet = async (req, res) => {
         },
       },
     ]);
-    console.log(wallet[0].transactions[0]);
 
     res.render("user/wallet", { user, wallet: wallet[0] });
   } catch (error) {

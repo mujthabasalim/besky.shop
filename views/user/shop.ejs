@@ -84,7 +84,7 @@
                       <% if (!category.parentCategory) { %>
                         <div class="accordion-item border-0">
                           <p class="accordion-header">
-                            <a class="text-decoration-none text-dark" data-bs-toggle="collapse"
+                            <a class="text-decoration-none text-dark" role="button" data-bs-toggle="collapse"
                               data-bs-target="#<%= category._id %>Accordion" aria-expanded="true"
                               aria-controls="<%= category._id %>Accordion">
                               <%= category.name %>
@@ -304,7 +304,7 @@
                                   <a href="/auth/login"><i class="bi bi-heart" style="color: black;"></i></a>
                               `}
                               <a href="/product/${product._id}/0" class="text-decoration-none text-dark">
-                                  ${product.variants[0].images.length > 0 ? `<img src="${product.variants[0].images[0]}" class="product-img card-img-top" alt="${product.name}">` : ''}
+                                  ${product.variants[0].images.length > 0 ? `<img src="/public/uploads/${product.variants[0].images[0]}" class="product-img card-img-top" alt="${product.name}">` : ''}
                                   <div class="card-body">
                                       <p class="card-title mb-1"><strong>${product.brand}</strong></p>
                                       <p class="card-title mb-0">${product.name} ${product.variants[0].color}</p>

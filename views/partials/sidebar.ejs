@@ -3,7 +3,7 @@
 
 <div class="sidebar shadow-sm d-none d-lg-block pt-3">
   <div class="d-flex gap-2 pb-3 ps-4 admin-welcome">
-    <img src="<%= user.profilePicture ? user.profilePicture : 'https://www.gravatar.com/avatar/?d=mp' %>" class="rounded-circle profile-image" alt="">
+    <img src="<%= user.profilePicture ? `/public/uploads/${user.profilePicture}` : 'https://www.gravatar.com/avatar/?d=mp' %>" class="rounded-circle profile-image" alt="User profile picture">
     <div>
       <h5 class="m-0">Hello 👋</h5>
       <p class="text-muted m-0">

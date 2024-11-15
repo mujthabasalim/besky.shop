@@ -14,7 +14,7 @@ const { generateSalesReport } = require("../services/salesReport");
 const { generatePDFReport } = require("../services/pdfService");
 const generateExcelReport = require("../services/excelService");
 const getPaginationData = require("../utils/pagination");
-const WalletService = require("../services/WalletService");
+const WalletService = require("../services/walletService");
 const { createNotification } = require("../services/notificationService");
 const {
   getTopProducts,
@@ -573,10 +573,7 @@ exports.saveProduct = async (req, res) => {
         if (!variantFilesMap[variantIndex]) {
           variantFilesMap[variantIndex] = [];
         }
-        const path = file.path.replace(
-          "C:\\Users\\YASNA UBAID\\Desktop\\Web development\\be.sky",
-          ""
-        );
+        const path = file.filename;
         variantFilesMap[variantIndex].push({ imageIndex, path });
       }
     });

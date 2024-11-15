@@ -1,5 +1,8 @@
 require("dotenv").config();
 const User = require("../models/User");
+const Cart = require("../models/Cart");
+const Wishlist = require("../models/Wishlist");
+const Wallet = require("../models/Wallet");
 const bcrypt = require("bcrypt");
 
 const { capitalizeFirstLetter } = require("../utils/stringUtils");
@@ -87,6 +90,24 @@ exports.successGoogleLogin = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
     });
+
+    // create cart wishlist, wallet
+    const userId = user._id;
+    await Cart.findOneAndUpdate(
+      { userId },
+      { $setOnInsert: { items: [] } },
+      { upsert: true, new: true }
+    );
+    await Wishlist.findOneAndUpdate(
+      { userId },
+      { $setOnInsert: { products: [] } },
+      { upsert: true, new: true }
+    );
+    await Wallet.findOneAndUpdate(
+      { userId },
+      { $setOnInsert: { balance: 0, transactions: [] } },
+      { upsert: true, new: true }
+    );
 
     // Redirect to home page
     res.redirect("/");
@@ -187,6 +208,24 @@ exports.verifyOTP = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
     });
+
+    // create cart wishlist, wallet
+    const userId = user._id;
+    await Cart.findOneAndUpdate(
+      { userId },
+      { $setOnInsert: { items: [] } },
+      { upsert: true, new: true }
+    );
+    await Wishlist.findOneAndUpdate(
+      { userId },
+      { $setOnInsert: { products: [] } },
+      { upsert: true, new: true }
+    );
+    await Wallet.findOneAndUpdate(
+      { userId },
+      { $setOnInsert: { balance: 0, transactions: [] } },
+      { upsert: true, new: true }
+    );
 
     res.redirect("/");
   } catch (error) {

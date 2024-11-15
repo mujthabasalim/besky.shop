@@ -223,7 +223,7 @@
             <div class="thumbnails col-12 col-lg-3 mb-3 mb-lg-0 d-flex flex-lg-column justify-content-center">
               <% variant.images.forEach((image, index)=> { %>
                 <div class="thumbnail-wrapper col-3 col-lg-12 mb-2">
-                  <img src="<%= image %>" alt="Thumbnail <%= index + 1 %>" class="thumbnail-img img-fluid"
+                  <img src="/public/uploads/<%= image %>" alt="Thumbnail <%= index + 1 %>" class="thumbnail-img img-fluid"
                     style="cursor: pointer;" onclick="updateMainImage('<%= encodeURIComponent(image) %>')">
                 </div>
                 <% }) %>
@@ -232,7 +232,7 @@
             <!-- Main Image (With Zoom Effect) -->
             <div class="main-image col-12 col-lg-9">
               <div class="product-images position-relative">
-                <img id="mainImage" src="<%= variant.images[0] %>" alt="Product Image" class="img-fluid zoomable"
+                <img id="mainImage" src="/public/uploads/<%= variant.images[0] %>" alt="Product Image" class="img-fluid zoomable"
                   onmousemove="zoomImage(event)" onmouseleave="resetZoom()">
               </div>
             </div>
@@ -409,29 +409,30 @@
         mainImage.classList.add('zoomed');
 
         // Adjust the transform origin based on where the mouse is
-        const xPercent = (x / mainImage.width) * 100;
-        const yPercent = (y / mainImage.height) * 100;
+        const xPercent = (x / mainImage.width) * 50;
+        const yPercent = (y / mainImage.height) * 50;
         mainImage.style.transformOrigin = `${xPercent}% ${yPercent}%`;
       }
 
       function resetZoom() {
         const mainImage = document.getElementById('mainImage');
         mainImage.classList.remove('zoomed');
-        mainImage.style.transformOrigin = 'center center'; // Reset to center
+        mainImage.style.transformOrigin = 'center center';
       }
     </script>
 
-
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        const maxCount = 10;
+        const maxCount = 3;
 
         document.body.addEventListener('click', async function (event) {
           const target = event.target;
           const isIncrement = target.classList.contains('increment-btn');
           const isDecrement = target.classList.contains('decrement-btn');
           const quantityInput = target.parentElement.querySelector('.quantity-input');
-          let currentValue = parseInt(quantityInput.value);
+          if (quantityInput) {
+            let currentValue = parseInt(quantityInput.value);
+          
           const maxError = document.getElementById('maxError')
 
           let newQuantity = currentValue;
@@ -445,11 +446,15 @@
           }
 
           if (newQuantity > maxCount) {
-            return maxError.innerHTML = 'You have reached the maximum limit of ' + maxCount + ' items.'
+            return maxError.innerHTML = 'Quantity limit reached.';
           }
+          setTimeout(() => {
+              maxError.innerHTML = ''
+            }, 5000)
 
           // Update the input field with the new quantity
           quantityInput.value = newQuantity;
+        }
         })
         // Handle Add to Cart Button Click
         const addToCartBtn = document.getElementById('addToCartBtn');

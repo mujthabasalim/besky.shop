@@ -3,15 +3,15 @@ const router = express.Router();
 const adminController = require('../controllers/adminController');
 const couponController = require('../controllers/couponController');
 const notificationController = require('../controllers/notificationController');
-const { ensureAdminAndCheckToken, preventAdminAuthAccess } = require('../middleware/authMiddleware');
+const { ensureAdmin, preventAdmin } = require('../middleware/authMiddleware');
 const upload = require('../config/multer');
 
 // TODO: Routes for login
-router.get('/login', preventAdminAuthAccess, adminController.loadLogin);
+router.get('/login', preventAdmin, adminController.loadLogin);
 router.post('/login', adminController.login);
 
 // Ensure admin access
-router.use(ensureAdminAndCheckToken);
+router.use(ensureAdmin);
 
 // TODO: Routes for dashboard
 router.get('/dashboard', adminController.loadDashboard);

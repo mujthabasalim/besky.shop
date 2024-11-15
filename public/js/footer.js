@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <p>You have ${data.cartItems.length} items in your cart</p>
               ${data.cartItems.map(item => `
                 <div class="cart-item">
-                  <img src="${item.image}" alt="${item.name}" width="60">
+                  <img src="/public/uploads/${item.image}" alt="${item.name}" width="60">
                   <div>
                     <p class="m-0">${item.name}</p>
                     <p class="m-0">${item.quantity} x $${item.discountedPrice.toFixed(2)}<br>Size: ${item.size}</p>

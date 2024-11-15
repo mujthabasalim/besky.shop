@@ -1,38 +1,49 @@
 const { generateToken, verifyToken } = require('../services/jwtService');
+const User = require('../models/User');
 
 // Middleware to check if JWT token is valid and update its expiration
-exports.checkToken = (req, res, next) => {
+exports.checkToken = async (req, res, next) => {
   const token = req.cookies.token;
+  res.locals.token = false;
+  res.locals.profilePicture = null;
+
   const isProtectedRoute = req.route && req.route.protected;
 
-  // Function to handle token verification
-  const handleToken = (token) => {
+  const handleToken = async (token) => {
     try {
       const decoded = verifyToken(token);
+
+      const user = await User.findById(decoded.id);
+      if (!user || user.status !== 'Active') {
+        res.clearCookie('token');
+        req.flash('error', 'User not found or inactive')
+      }
+
+      // Set token and profile picture
+      res.locals.token = true;
+      res.locals.profilePicture = decoded.profilePicture;
+
       const now = Math.floor(Date.now() / 1000);
       const oneDayInSeconds = 24 * 60 * 60;
 
-      // Update token expiration if about to expire
       if (decoded.exp - now < oneDayInSeconds) {
         const newToken = generateToken(decoded);
         res.cookie('token', newToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
       }
 
-      req.user = decoded; // Attach decoded token to request
+      req.user = decoded;
     } catch (error) {
-      console.error('Invalid token:', error);
-      res.clearCookie('token'); // Clear the cookie if token is invalid
-      throw new Error('Invalid token');
+      console.error('Invalid token or user inactive:', error);
+      res.clearCookie('token');
+      throw new Error('Invalid token or inactive user');
     }
   };
 
   if (token) {
-    handleToken(token);
+    await handleToken(token);
   }
 
-  // Check for protected routes
   if (isProtectedRoute && !req.user) {
-    // User is not authenticated
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
       return res.status(401).json({ success: false, message: 'Please log in to continue.' });
     }
@@ -42,19 +53,49 @@ exports.checkToken = (req, res, next) => {
   next();
 };
 
+// Middleware to Ensure Admin and Check Token
+exports.ensureAdmin = async (req, res, next) => {
+  const adminToken = req.cookies.adminToken;
+
+  if (!adminToken) {
+    return res.redirect('/admin/login');
+  }
+
+  try {
+    const decoded = verifyToken(adminToken);
+
+    const adminUser = await User.findById(decoded.id);
+    if (!adminUser || adminUser.status !== 'Active' || decoded.role !== 'admin') {
+      throw new Error('User not found, inactive, or not an admin');
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    const oneDayInSeconds = 24 * 60 * 60;
+
+    if (decoded.exp - now < oneDayInSeconds) {
+      const newToken = generateToken(decoded);
+      res.cookie('adminToken', newToken, { httpOnly: true, secure: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+    }
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error('Admin check failed:', error);
+    res.clearCookie('adminToken');
+    return res.redirect('/admin/login');
+  }
+};
 
 // Middleware to prevent logged-in users from accessing login/register pages
-exports.preventAuthAccess = (req, res, next) => {
+exports.preventAuthAccess = async (req, res, next) => {
   const token = req.cookies.token;
 
   if (token) {
-    
     try {
       const decoded = verifyToken(token);
-      req.user = decoded;
+      const user = await User.findById(decoded.id);
 
-      // Check if the user is an admin or a regular user
-      if (decoded.role === 'user') {
+      if (user && user.status === 'Active' && decoded.role === 'user') {
         return res.redirect('/');
       }
     } catch (error) {
@@ -65,61 +106,23 @@ exports.preventAuthAccess = (req, res, next) => {
   next();
 };
 
-// Middleware to Ensure Admin and Check Token
-exports.ensureAdminAndCheckToken = (req, res, next) => {
-  const adminToken = req.cookies.adminToken;
-
-  if (!adminToken) {
-    return res.redirect('/admin/login');
-  }
-
-  try {
-    const decoded = verifyToken(adminToken);
-    const now = Math.floor(Date.now() / 1000);
-    const oneDayInSeconds = 24 * 60 * 60;
-
-    // Check if the decoded token contains the admin role
-    if (decoded.role !== 'admin') {
-      return res.redirect('/');
-    }
-
-    // Refresh the token if it's close to expiry
-    if (decoded.exp - now < oneDayInSeconds) {
-      const newToken = generateToken(decoded);
-      res.cookie('adminToken', newToken, { httpOnly: true, secure: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 1 week expiration
-    }
-
-    req.user = decoded;
-    return next();
-  } catch (error) {
-    console.error('Error ensuring admin and checking token:', error);
-    return res.redirect('/admin/login');
-  }
-};
-
-// Middleware to prevent logged-in users from accessing login/register pages
-exports.preventAdminAuthAccess = (req, res, next) => {
+// Middleware to prevent logged-in admin from accessing login
+exports.preventAdmin = async (req, res, next) => {
   const adminToken = req.cookies.adminToken;
 
   if (adminToken) {
     try {
       const decoded = verifyToken(adminToken);
-      req.user = decoded;
+      const adminUser = await User.findById(decoded.id);
 
-      // Check if the user is an admin or a regular user
-      if (decoded.role === 'admin') {
+      if (adminUser && adminUser.status === 'Active' && decoded.role === 'admin') {
         return res.redirect('/admin/dashboard');
       }
     } catch (error) {
-      console.error('Invalid token:', error);
+      console.error('Invalid admin token:', error);
       res.clearCookie('adminToken');
     }
   }
 
   next();
 };
-
-exports.storeToken = (req, res, next) => {
-  res.locals.token = req.cookies.token || null;
-  next();
-}

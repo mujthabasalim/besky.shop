@@ -84,7 +84,7 @@
     <div class="container">
       <div class="profile-container mb-4">
         <form action="/protected/profile-update" method="POST" enctype="multipart/form-data">
-          <img src="<%= user.profilePicture ? user.profilePicture : 'https://www.gravatar.com/avatar/?d=mp' %>"
+          <img src="<%= user.profilePicture ? `/public/uploads/${user.profilePicture}` : 'https://www.gravatar.com/avatar/?d=mp' %>"
             alt="Profile" class="profile-img">
           <input type="file" class="image-input" name="profileImage" style="display: none;" />
           <div class="edit-btn image-label">

@@ -172,7 +172,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const maxCount = 10;
+    const maxCount = 3;
     const cartUpdateUrl = '/protected/cart/manage';
     const cartDeleteUrl = '/protected/cart/delete';
 
@@ -199,8 +199,7 @@
         } else if (isDecrement && currentQuantity > 1) {
           currentQuantity--;
         } else {
-          createToast('You have reached the maximum limit of ' + maxCount + ' items.', 'error');
-          return;
+          return createToast('Quantity limit reached.', 'error');
         }
 
         // Update quantity in the input
