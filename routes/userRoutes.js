@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const userController = require('../controllers/userController');
-const { checkToken, storeToken } = require('../middleware/authMiddleware');
+const { checkToken } = require('../middleware/authMiddleware');
 const upload = require('../config/multer');
 
 router.use((req, res, next) => {

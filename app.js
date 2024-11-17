@@ -64,10 +64,15 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/', userRoutes);
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
+// for 404 routes
+app.all('*', (req, res) => {
+  res.render('partials/404');
 });
+
+// // Global error handler
+// app.use((err, req, res, next) => {
+//   console.error(err.stack);
+// });
 
 app.listen(PORT,"0.0.0.0", () => console.log(`Server running on port http://localhost:${PORT}`));
 

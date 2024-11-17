@@ -9,12 +9,7 @@ const CartItemSchema = new Schema({
   },
   variantId: { type: Schema.Types.ObjectId, required: true },
   size: { type: String, required: true },
-  quantity: { type: Number, required: true, min: 1, max: 10},
-  inventoryStatus: {
-    type: String,
-    enum: ['In stock', 'Out of stock', 'Low stock'],
-    default: 'In stock'
-  }
+  quantity: { type: Number, required: true, min: 1, max: 3},
 });
 
 const CartSchema = new Schema({

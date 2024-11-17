@@ -160,6 +160,7 @@
                 </div>
               <% }) %>
             <% } else { %> 
+              <p>No coupons available</p>
             <% } %>
           </div>
         </div>
@@ -183,9 +184,7 @@
     </div>
   </div>
 </div>
-<% } else { %>
-  <a href="/protected/cart"></a>
-<% } %>
+
 
 
 
@@ -539,5 +538,10 @@ applyDiscountButton.addEventListener('click', async () => {
 
 </script>
 
+<% } else { %>
+  <script>
+    window.location.href = '/protected/cart';
+  </script>
+<% } %>
 
 <%- include('../partials/footer') %>

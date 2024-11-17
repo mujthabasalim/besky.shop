@@ -31,6 +31,5 @@ function hideMessage(id) {
   }, 5000); 
 }
 
-// Check if success or error message exists, then hide after 3 seconds
 if (document.getElementById('success-message')) hideMessage('success-message');
 if (document.getElementById('error-message')) hideMessage('error-message');

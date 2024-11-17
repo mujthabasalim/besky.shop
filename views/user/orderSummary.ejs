@@ -92,281 +92,298 @@
       color: #000000;
     }
   </style>
-  <% if (cartItems.length > 0) { %>
-  <div class="container mt-5">
-    <h3 class="mb-4">Order Summary</h3>
-    <div class="row">
-      <div class="col-lg-8 col-md-12 mb-3">
-        <div class="stepper d-flex justify-content-between align-items-center mb-3">
-          <!-- Step 1: Address -->
-          <div class="step completed text-center d-flex flex-column justify-content-center align-items-center">
-            <div class="icon">
-              <i class="fas fa-home"></i>
-            </div>
-            <p class="m-0">Address</p>
-          </div>
-          <!-- Step 2: Payment Method -->
-          <div class="step completed text-center d-flex flex-column justify-content-center align-items-center">
-            <div class="icon">
-              <i class="fas fa-credit-card"></i>
-            </div>
-            <p class="m-0">Payment Method</p>
-          </div>
-          <!-- Step 3: Review -->
-          <div class="step completed text-center d-flex flex-column justify-content-center align-items-center">
-            <div class="icon">
-              <i class="fas fa-file-alt"></i>
-            </div>
-            <p class="m-0">Review</p>
-          </div>
-        </div>
-        <span><strong>Estimated delivery:</strong></span>
+  <% if (cartItems.length> 0) { %>
+    <div class="container mt-5">
+      <h3 class="mb-4">Order Summary</h3>
+      <!-- Display Success Flash Message -->
+ <% if (successMessage && successMessage.length > 0) { %>
+  <p class="success-message text-success" id="success-message"><%- successMessage %></p>
+<% } %>
 
-        <!-- Order Items -->
-        <% cartItems.forEach((item, index)=> { %>
-          <div class="d-flex align-items-center border-bottom py-3">
-            <img src="<%= item.image %>" alt="<%= item.name %>" class="product-image me-3">
-            <div class="order-item-details">
-              <p class="m-0">
-                <%= item.name %>
-              </p>
-              <p class="m-0 text-black-50" style="font-size: 14px;">
-                Size: <%= item.size %> <span class="ms-1"> | Color: <%= item.color %></span>
-              </p>
-              <p class="m-0" style="font-size: 14px;"><span>
-                  <%= item.quantity %> X
-                </span><strong> &#8377;<%= item.discountedPrice %></strong></p>
-            </div>
-          </div>
-          <% }) %>
-
-
-            <!-- Shipping Address Section -->
-            <div class="border-bottom py-3">
-              <div class="d-flex justify-content-between align-items-center m-">
-                <strong>Shipping Address</strong>
-                <a href="/protected/checkout/shipping"><i class="fas fa-edit btn btn-light p-2"></i></a>
+<!-- Display Error Flash Message -->
+<% if (errorMessage && errorMessage.length > 0) { %>
+  <p class="error-message" id="error-message"><%- errorMessage %></p>
+<% } %>
+      <div class="row">
+        <div class="col-lg-8 col-md-12 mb-3">
+          <div class="stepper d-flex justify-content-between align-items-center mb-3">
+            <!-- Step 1: Address -->
+            <div class="step completed text-center d-flex flex-column justify-content-center align-items-center">
+              <div class="icon">
+                <i class="fas fa-home"></i>
               </div>
-              <p class="m-0">
-                <%= shippingAddress.fName %>
-                  <%= shippingAddress.lName %>
-              </p>
-              <p class="m-0">
-                <%= shippingAddress.houseName %>, <%= shippingAddress.area %>, <%=
-                      shippingAddress.city %>, <%= shippingAddress.postcode %>
-              </p>
-              <p class="m-0">
-                <%= shippingAddress.email %>, <%= shippingAddress.contactNo %>
-              </p>
+              <p class="m-0">Address</p>
             </div>
-
-            <!-- Payment Method Section -->
-            <div class="border-bottom py-3">
-              <div class="d-flex justify-content-between align-items-center">
-                <strong>Payment Method</strong>
-                <a href="/protected/checkout/payment"><i class="fas fa-edit btn btn-light p-2"></i></a>
+            <!-- Step 2: Payment Method -->
+            <div class="step completed text-center d-flex flex-column justify-content-center align-items-center">
+              <div class="icon">
+                <i class="fas fa-credit-card"></i>
               </div>
-              <p class="m-0">
-                <%= paymentMethod %>
+              <p class="m-0">Payment Method</p>
+            </div>
+            <!-- Step 3: Review -->
+            <div class="step completed text-center d-flex flex-column justify-content-center align-items-center">
+              <div class="icon">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              <p class="m-0">Review</p>
+            </div>
+          </div>
+          <span><strong>Estimated delivery:</strong></span>
+
+          <!-- Order Items -->
+          <% cartItems.forEach((item, index)=> { %>
+            <div class="d-flex align-items-center border-bottom py-3">
+              <img src="/public/uploads/<%= item.image %>" alt="<%= item.name %>" class="product-image me-3">
+              <div class="order-item-details">
+                <p class="m-0">
+                  <%= item.name %>
+                </p>
+                <p class="m-0 text-black-50" style="font-size: 14px;">
+                  Size: <%= item.size %> <span class="ms-1"> | Color: <%= item.color %></span>
+                </p>
+                <p class="m-0" style="font-size: 14px;"><span>
+                    <%= item.quantity %> X
+                  </span><strong> &#8377;<%= item.discountedPrice %></strong></p>
+              </div>
+            </div>
+            <% }) %>
+
+
+              <!-- Shipping Address Section -->
+              <div class="border-bottom py-3">
+                <div class="d-flex justify-content-between align-items-center m-">
+                  <strong>Shipping Address</strong>
+                  <a href="/protected/checkout/shipping"><i class="fas fa-edit btn btn-light p-2"></i></a>
+                </div>
+                <p class="m-0">
+                  <%= shippingAddress.fName %>
+                    <%= shippingAddress.lName %>
+                </p>
+                <p class="m-0">
+                  <%= shippingAddress.houseName %>, <%= shippingAddress.area %>, <%= shippingAddress.city %>, <%=
+                          shippingAddress.postcode %>
+                </p>
+                <p class="m-0">
+                  <%= shippingAddress.email %>, <%= shippingAddress.contactNo %>
+                </p>
+              </div>
+
+              <!-- Payment Method Section -->
+              <div class="border-bottom py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>Payment Method</strong>
+                  <a href="/protected/checkout/payment"><i class="fas fa-edit btn btn-light p-2"></i></a>
+                </div>
+                <p class="m-0">
+                  <%= paymentMethod %>
+                </p>
+              </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="col-lg-4 col-md-12">
+          <div class="shadow-sm p-3">
+            <h5>Summary</h5>
+            <hr>
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Subtotal</p>
+              <p class="mb-2" id="subtotalAmount">&#8377;<%= cartSummary.subtotal.toFixed(2) %>
               </p>
             </div>
-      </div>
-
-      <!-- Summary Section -->
-      <div class="col-lg-4 col-md-12">
-        <div class="shadow-sm p-3">
-          <h5>Summary</h5>
-          <hr>
-          <div class="d-flex justify-content-between">
-            <p class="mb-2">Subtotal</p>
-            <p class="mb-2" id="subtotalAmount">&#8377;<%= cartSummary.subtotal.toFixed(2) %></p>
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Discount</p>
+              <p class="mb-2" id="discount">&#8377;<%= cartSummary.couponDiscount.toFixed(2) %>
+              </p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Delivery Charge</p>
+              <p class="mb-2" id="deliveryCharge">
+                <%- cartSummary.deliveryCharge===0 ? '<del>\u20B940.00</del> Free' : '\u20B9' +
+                  cartSummary.deliveryCharge.toFixed(2) %>
+              </p>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between">
+              <p class="fw-bold">Grand Total</p>
+              <p class="fw-bold" id="grandTotal">&#8377;<%= cartSummary.grandTotal.toFixed(2) %>
+              </p>
+            </div>
+            <button class="btn btn-dark w-100 mt-3" id="placeOrderBtn">Place Order</button>
           </div>
-          <div class="d-flex justify-content-between">
-            <p class="mb-2">Discount</p>
-            <p class="mb-2" id="discount">&#8377;<%= cartSummary.couponDiscount.toFixed(2) %></p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p class="mb-2">Delivery Charge</p>
-            <p class="mb-2" id="deliveryCharge">
-              <%- cartSummary.deliveryCharge===0 ? '<del>\u20B940.00</del> Free' : '\u20B9' + cartSummary.deliveryCharge.toFixed(2) %>
-            </p>
-          </div>
-          <hr>
-          <div class="d-flex justify-content-between">
-            <p class="fw-bold">Grand Total</p>
-            <p class="fw-bold" id="grandTotal">&#8377;<%= cartSummary.grandTotal.toFixed(2) %></p>
-          </div>
-          <button class="btn btn-dark w-100 mt-3" id="placeOrderBtn">Place Order</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Order Confirmation Modal -->
-  <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-body">
-          <!-- Circle animation with tick in center -->
-          <div class="circle-container">
-            <div class="circle-four"></div>
-            <div class="circle-three"></div>
-            <div class="circle-two"></div>
-            <div class="circle-one"></div>
-            <i class="bi bi-check tick-mark"></i>
+    <!-- Order Confirmation Modal -->
+    <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body">
+            <!-- Circle animation with tick in center -->
+            <div class="circle-container">
+              <div class="circle-four"></div>
+              <div class="circle-three"></div>
+              <div class="circle-two"></div>
+              <div class="circle-one"></div>
+              <i class="bi bi-check tick-mark"></i>
+            </div>
+            <!-- Order confirmation text -->
+            <h5 class="modal-title" id="exampleModalLabel">Your order is confirmed</h5>
+            <p class="mb-5">Thanks for shopping! Your order hasn't shipped yet, but we will send you an email when it’s
+              done.</p>
+            <!-- Buttons -->
+            <a href="/protected/orders" class="btn btn-dark mb-2 w-100">View order</a>
+            <br>
+            <a href="/shop"><button type="button" class="btn btn-outline-dark w-100">Back to Home</button></a>
           </div>
-          <!-- Order confirmation text -->
-          <h5 class="modal-title" id="exampleModalLabel">Your order is confirmed</h5>
-          <p class="mb-5">Thanks for shopping! Your order hasn't shipped yet, but we will send you an email when it’s
-            done.</p>
-          <!-- Buttons -->
-          <a href="/protected/orders" class="btn btn-dark mb-2 w-100">View order</a>
-          <br>
-          <a href="/shop"><button type="button" class="btn btn-outline-dark w-100">Back to Home</button></a>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Payment Failure Modal -->
-<div class="modal fade" id="paymentFailureModal" tabindex="-1" aria-labelledby="paymentFailureLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body text-center">
-        <div class="circle-container">
-          <div class="circle-four"></div>
-          <div class="circle-three"></div>
-          <div class="circle-two"></div>
-          <div class="circle-one"></div>
-          <i class="bi bi-x tick-mark"></i>
+    <!-- Payment Failure Modal -->
+    <div class="modal fade" id="paymentFailureModal" tabindex="-1" aria-labelledby="paymentFailureLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center">
+            <div class="circle-container">
+              <div class="circle-four"></div>
+              <div class="circle-three"></div>
+              <div class="circle-two"></div>
+              <div class="circle-one"></div>
+              <i class="bi bi-x tick-mark"></i>
+            </div>
+            <h5 class="modal-title">Payment Failed</h5>
+            <p>Something went wrong. Please try again or cancel the order.</p>
+            <button id="retryPaymentBtn" class="btn btn-dark mb-2 w-100">Retry Payment</button>
+            <button id="cancelOrderBtn" class="btn btn-outline-dark w-100">Cancel Order</button>
+          </div>
         </div>
-        <h5 class="modal-title">Payment Failed</h5>
-        <p>Something went wrong. Please try again or cancel the order.</p>
-        <button id="retryPaymentBtn" class="btn btn-dark mb-2 w-100">Retry Payment</button>
-        <button id="cancelOrderBtn" class="btn btn-outline-dark w-100">Cancel Order</button>
       </div>
     </div>
-  </div>
-</div>
-
-  <% } else { %>
-    <a href="/protected/cart"></a>
-  <% } %>
 
 
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-  document.getElementById('placeOrderBtn').addEventListener('click', async () => {
-  try {
-    const paymentMethod = '<%= paymentMethod %>';
-    const response = await fetch('/protected/order-place', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    });
 
-    if (response.ok) {
-      const result = await response.json();
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      document.getElementById('placeOrderBtn').addEventListener('click', async () => {
+        try {
+          const paymentMethod = '<%= paymentMethod %>';
+          const response = await fetch('/protected/order-place', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
 
-      if (paymentMethod === 'razorpay') {
-        // Razorpay configuration
-        const razorpayOptions = {
-          key: "<%= process.env.RAZORPAY_ID_KEY %>",
-          amount: result.amount * 100,
-          currency: "INR",
-          name: "be.sky",
-          description: "Purchase",
-          order_id: result.razorpayOrderId,
-          handler: async function (response) {
-            // Call verifyPayment for successful payment
-            await verifyPayment(response, result.orderId, razorpayOptions);
-          },
-          prefill: {
-            name: "<%= shippingAddress.fName %>",
-            email: "<%= shippingAddress.email %>",
-            contact: "<%= shippingAddress.contactNo %>"
-          },
-          theme: { color: "#000000" },
-        };
+          if (response.ok) {
+            const result = await response.json();
 
-        // Open Razorpay modal
-        openRazorpay(razorpayOptions, result.orderId);
-      } else {
-        showOrderConfirmationModal();
+            if (paymentMethod === 'razorpay') {
+              // Razorpay configuration
+              const razorpayOptions = {
+                key: "<%= process.env.RAZORPAY_ID_KEY %>",
+                amount: result.amount * 100,
+                currency: "INR",
+                name: "be.sky",
+                description: "Purchase",
+                order_id: result.razorpayOrderId,
+                handler: async function (response) {
+                  // Call verifyPayment for successful payment
+                  await verifyPayment(response, result.orderId, razorpayOptions);
+                },
+                prefill: {
+                  name: "<%= shippingAddress.fName %>",
+                  email: "<%= shippingAddress.email %>",
+                  contact: "<%= shippingAddress.contactNo %>"
+                },
+                theme: { color: "#000000" },
+              };
+
+              // Open Razorpay modal
+              openRazorpay(razorpayOptions, result.orderId);
+            } else {
+              showOrderConfirmationModal();
+            }
+          } else {
+            createToast((await response.json()).message, 'error');
+          }
+        } catch (error) {
+          console.error("Error placing order:", error);
+          createToast('Failed to place order. Please try again.', 'error');
+        }
+      });
+
+      // Function to open Razorpay modal
+      function openRazorpay(options, orderId) {
+        const razorpay = new Razorpay(options);
+        razorpay.open();
+
+        // Handle payment failure and call verifyPayment on failure
+        razorpay.on('payment.failed', async function (response) {
+          console.error("Payment failed:", response);
+          razorpay.close();
+          await verifyPayment(response, orderId, options);
+        });
       }
-    } else {
-      createToast((await response.json()).message, 'error');
-    }
-  } catch (error) {
-    console.error("Error placing order:", error);
-    createToast('Failed to place order. Please try again.', 'error');
-  }
-});
 
-// Function to open Razorpay modal
-function openRazorpay(options, orderId) {
-  const razorpay = new Razorpay(options);
-  razorpay.open();
+      // Verify payment function (handles both success and failure)
+      async function verifyPayment(response, orderId, options) {
+        try {
+          const paymentResponse = await fetch('/protected/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpayPaymentId: response.razorpay_payment_id || null,
+              razorpayOrderId: response.razorpay_order_id || null,
+              razorpaySignature: response.razorpay_signature || null,
+              orderId: orderId,
+            })
+          });
 
-  // Handle payment failure and call verifyPayment on failure
-  razorpay.on('payment.failed', async function (response) {
-    console.error("Payment failed:", response);
-    razorpay.close();
-    await verifyPayment(response, orderId, options); 
-  });
-}
+          if (paymentResponse.ok) {
+            showOrderConfirmationModal();
+          } else {
+            showPaymentFailureModal(options);
+          }
+        } catch (error) {
+          console.error("Error verifying payment:", error);
+          showPaymentFailureModal(options);
+        }
+      }
 
-// Verify payment function (handles both success and failure)
-async function verifyPayment(response, orderId, options) {
-  try {
-    const paymentResponse = await fetch('/protected/verify-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        razorpayPaymentId: response.razorpay_payment_id || null,
-        razorpayOrderId: response.razorpay_order_id || null,
-        razorpaySignature: response.razorpay_signature || null,
-        orderId: orderId,
-      })
-    });
+      // Show order confirmation modal
+      function showOrderConfirmationModal() {
+        const orderModal = new bootstrap.Modal(document.getElementById('orderModal'), {
+          keyboard: false,
+          backdrop: 'static'
+        });
+        orderModal.show();
+      }
 
-    if (paymentResponse.ok) {
-      showOrderConfirmationModal();
-    } else {
-      showPaymentFailureModal(options);
-    }
-  } catch (error) {
-    console.error("Error verifying payment:", error);
-    showPaymentFailureModal(options);
-  }
-}
+      // Show payment failure modal with retry option
+      function showPaymentFailureModal(options) {
+        const paymentFailureModal = new bootstrap.Modal(document.getElementById('paymentFailureModal'), {
+          keyboard: false,
+          backdrop: 'static'
+        });
+        paymentFailureModal.show();
 
-// Show order confirmation modal
-function showOrderConfirmationModal() {
-  const orderModal = new bootstrap.Modal(document.getElementById('orderModal'), {
-    keyboard: false,
-    backdrop: 'static'
-  });
-  orderModal.show();
-}
+        // Add event listener to the Retry button to close modal and retry payment
+        document.getElementById('retryPaymentBtn').addEventListener('click', function handleRetry() {
+          paymentFailureModal.hide();
+          openRazorpay(options);
 
-// Show payment failure modal with retry option
-function showPaymentFailureModal(options) {
-  const paymentFailureModal = new bootstrap.Modal(document.getElementById('paymentFailureModal'), {
-    keyboard: false,
-    backdrop: 'static'
-  });
-  paymentFailureModal.show();
+          document.getElementById('retryPaymentBtn').removeEventListener('click', handleRetry);
+        });
+      }
 
-  // Add event listener to the Retry button to close modal and retry payment
-  document.getElementById('retryPaymentBtn').addEventListener('click', function handleRetry() {
-    paymentFailureModal.hide();
-    openRazorpay(options);
+    </script>
 
-    document.getElementById('retryPaymentBtn').removeEventListener('click', handleRetry);
-  });
-}
-
-</script>
+    <% } else { %>
+      <script>
+        window.location.href = '/protected/cart';
+      </script>
+      <% } %>
 
 
-  <%- include('../partials/footer') %>
+        <%- include('../partials/footer') %>

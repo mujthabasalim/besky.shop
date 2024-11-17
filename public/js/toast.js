@@ -5,7 +5,7 @@
     // Create and configure toast element
     const toast = document.createElement('div');
     toast.classList.add('custom-toast', type);
-    toast.innerHTML = `<strong>${type.toUpperCase()}:</strong> ${message}`;
+    toast.innerHTML = `${message}`;
 
     const container = document.getElementById('custom-toast-container');
     container.appendChild(toast);

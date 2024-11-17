@@ -9,8 +9,7 @@ const Wishlist = require("../models/Wishlist");
 const Wallet = require("../models/Wallet");
 const Review = require("../models/Review");
 const { applyHighestDiscount } = require("../utils/discountCalculator");
-const 
-WalletService = require("../services/walletService");
+const WalletService = require("../services/walletService");
 const { createNotification } = require("../services/notificationService");
 const { generateInvoice } = require("../services/pdfService");
 const Notification = require("../models/Notification");
@@ -40,15 +39,17 @@ exports.loadShop = async (req, res) => {
 
     // Initialize filter with isActive checks for product and categories
     const filter = {
-      isActive: true,  // Product must be active
+      isActive: true, // Product must be active
       parentCategory: { $exists: true },
       subCategory: { $exists: true },
     };
 
     // Only include products with active parent and subcategories
-    const activeCategories = await Category.find({ isActive: true }).select('_id');
+    const activeCategories = await Category.find({ isActive: true }).select(
+      "_id"
+    );
 
-    const activeCategoryIds = activeCategories.map(category => category._id);
+    const activeCategoryIds = activeCategories.map((category) => category._id);
 
     filter.parentCategory = { $in: activeCategoryIds };
     filter.subCategory = { $in: activeCategoryIds };
@@ -74,14 +75,18 @@ exports.loadShop = async (req, res) => {
     if (req.query.search) {
       const matchedCategories = await Category.find({
         name: { $regex: req.query.search, $options: "i" },
-        isActive: true  // Ensure searched categories are active
+        isActive: true, // Ensure searched categories are active
       });
       const categoryIds = matchedCategories.map((category) => category._id);
 
       filter.$or = [
         { name: { $regex: req.query.search, $options: "i" } },
         { brand: { $regex: req.query.search, $options: "i" } },
-        { attributes: { $elemMatch: { $regex: req.query.search, $options: "i" } } },
+        {
+          attributes: {
+            $elemMatch: { $regex: req.query.search, $options: "i" },
+          },
+        },
         { parentCategory: { $in: categoryIds } },
         { subCategory: { $in: categoryIds } },
       ];
@@ -127,7 +132,9 @@ exports.loadShop = async (req, res) => {
     if (req.user) {
       const userWishlist = await Wishlist.findOne({ userId: req.user.id });
       if (userWishlist) {
-        wishlist = userWishlist.products.map((item) => item.productId.toString());
+        wishlist = userWishlist.products.map((item) =>
+          item.productId.toString()
+        );
       }
     }
 
@@ -139,7 +146,7 @@ exports.loadShop = async (req, res) => {
         pagination,
       });
     } else {
-      res.render('user/shop', {
+      res.render("user/shop", {
         products: productsWithDiscounts,
         categories,
         wishlist,
@@ -149,7 +156,7 @@ exports.loadShop = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send('An error occurred while loading the shop.');
+    res.status(500).send("An error occurred while loading the shop.");
   }
 };
 
@@ -236,30 +243,48 @@ exports.showProfile = async (req, res) => {
   }
 };
 
-// Handle profile update
 exports.updateProfile = async (req, res) => {
   const { firstName, lastName, phone, email } = req.body;
 
   try {
     const user = await User.findById(req.user.id);
 
+    // Check if email already exists for another user
+    const existingUser = await User.findOne({ email });
+    if (existingUser && existingUser.id !== req.user.id) {
+      return res.status(400).json({ success: false, message: "Email already exists" })
+    }
+
+    // Update profile
     let profilePicture = user.profilePicture;
     if (req.file) {
-      profilePicture = req.file.filename
+      profilePicture = req.file.filename;
     }
 
     const userData = { firstName, lastName, phone, email, profilePicture };
 
     if (user) {
-      await User.findByIdAndUpdate(user, userData, { new: true });
-      res.redirect("/protected/profile");
+      await User.findByIdAndUpdate(user.id, userData, { new: true });
+      return res.json({
+        success: true,
+        message: "Profile updated successfully.",
+      });
     } else {
-      console.log("User not found");
+      return res
+        .status(404)
+        .json({ success: false, errors: { general: "User not found." } });
     }
   } catch (error) {
     console.error(error);
+    return res
+      .status(500)
+      .json({
+        success: false,
+        errors: { general: "An error occurred. Please try again later." },
+      });
   }
 };
+
 
 // Handle address addition and updating
 exports.saveAddress = async (req, res) => {
@@ -374,7 +399,7 @@ exports.deleteAddress = async (req, res) => {
   }
 };
 
-const calculateCartSummaryAndValidate = async (userId, couponCode = null) => {
+const calculateCartSummary = async (userId, couponCode = null) => {
   const cart = await Cart.findOne({ userId }).populate("items.productId");
 
   const currentDate = new Date();
@@ -390,17 +415,17 @@ const calculateCartSummaryAndValidate = async (userId, couponCode = null) => {
     const variant = product.variants.id(item.variantId);
     const sizeData = variant.sizes.find((s) => s.size === item.size);
 
+    let inventoryStatus;
     if (!variant || !sizeData || sizeData.stock < item.quantity) {
-      throw new Error(
-        `Insufficient stock for ${product.name} (${item.size}, ${variant.color}).`
-      );
+      inventoryStatus = `${sizeData ? sizeData.stock : 0} left in stock.`;
+    } else {
+      inventoryStatus = "In stock";
     }
 
-    const inventoryStatus = sizeData.stock > 0 ? "In stock" : "Stock out";
     const discountedPrice = applyHighestDiscount(product, offers);
     const total = item.quantity * discountedPrice;
     subtotal += total;
-
+    
     return {
       productId: product._id,
       variantId: variant._id,
@@ -474,7 +499,7 @@ exports.showCart = async (req, res) => {
 
     const couponCode = req.session.couponCode || null;
 
-    const { cartItems, cartSummary } = await calculateCartSummaryAndValidate(
+    const { cartItems, cartSummary } = await calculateCartSummary(
       userId,
       couponCode
     );
@@ -513,17 +538,25 @@ exports.manageCart = async (req, res) => {
     const maxQuantity = 3;
 
     if (quantity > maxQuantity) {
-      return res.status(400).json({ success: false, message: 'Quantity limit reached.'});
+      return res
+        .status(400)
+        .json({ success: false, message: "Quantity limit reached." });
     }
 
-    const cart = (await Cart.findOne({ userId })) || new Cart({ userId, items: [] });
+    const cart =
+      (await Cart.findOne({ userId })) || new Cart({ userId, items: [] });
 
     const product = await Product.findById(productId).select("variants");
     const variant = product.variants.id(variantId);
     const sizeData = variant.sizes.find((s) => s.size === size);
 
     if (!sizeData || sizeData.stock < quantity) {
-      return res.status(400).json({ success: false, message:"Insufficient stock for the selected size"});
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Insufficient stock for the selected size",
+        });
     }
 
     const existingItemIndex = cart.items.findIndex(
@@ -552,7 +585,7 @@ exports.applyCoupon = async (req, res) => {
   const { couponCode } = req.body;
   try {
     const userId = req.user.id;
-    const updatedCartSummary = await calculateCartSummaryAndValidate(
+    const updatedCartSummary = await calculateCartSummary(
       userId,
       couponCode
     );
@@ -576,7 +609,7 @@ exports.removeCoupon = async (req, res) => {
     const userId = req.user.id;
 
     // Recalculate the cart summary without the coupon
-    const { cartItems, cartSummary } = await calculateCartSummaryAndValidate(
+    const { cartItems, cartSummary } = await calculateCartSummary(
       userId
     );
 
@@ -678,10 +711,23 @@ exports.handleCheckoutStage = async (req, res) => {
     const couponCode = req.session.couponCode;
     const paymentMethod = req.session.paymentMethod;
 
-    const { cartItems, cartSummary } = await calculateCartSummaryAndValidate(
+    const { cartItems, cartSummary } = await calculateCartSummary(
       userId,
       couponCode
     );
+
+    // Check for any inventory issues in cart items
+    const insufficientStockItems = cartItems.filter(
+      (item) => item.inventoryStatus !== "In stock"
+    );
+
+    if (insufficientStockItems.length > 0) {
+      req.flash(
+        "error",
+        "Some items in your cart have insufficient stock. Please review your cart."
+      );
+      return res.redirect("/protected/cart");
+    }
 
     const currentDate = new Date();
     const coupons = await Coupon.find({
@@ -782,10 +828,22 @@ exports.placeOrder = async (req, res) => {
     }
 
     // Validate cart and calculate total amounts using the summary function
-    const { cartItems, cartSummary } = await calculateCartSummaryAndValidate(
+    const { cartItems, cartSummary } = await calculateCartSummary(
       userId,
       couponCode
     );
+
+    // Check for any inventory issues in cart items
+    const insufficientStockItems = cartItems.filter(
+      (item) => item.inventoryStatus !== "In stock"
+    );
+
+    if (insufficientStockItems.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Some items in your cart have insufficient stock. Please review your cart.",
+      });
+    }
 
     // Create the order object
     const order = new Order({
@@ -871,6 +929,14 @@ exports.placeOrder = async (req, res) => {
       await coupon.save();
     }
 
+    // Clear the cart after the order is placed
+    await Cart.findOneAndUpdate({ userId }, { items: [] });
+
+    // Clear session data after order
+    req.session.addressId = null;
+    req.session.paymentMethod = null;
+    req.session.couponCode = null;
+
     // For Razorpay, create payment and send Razorpay order ID back
     if (paymentMethod === "razorpay") {
       try {
@@ -895,14 +961,6 @@ exports.placeOrder = async (req, res) => {
         });
       }
     }
-
-    // Clear the cart after the order is placed
-    await Cart.findOneAndUpdate({ userId }, { items: [] });
-
-    // Clear session data after order
-    req.session.addressId = null;
-    req.session.paymentMethod = null;
-    req.session.couponCode = null;
 
     // If wallet or COD, return success
     res
@@ -968,21 +1026,17 @@ exports.verifyPayment = async (req, res) => {
       // Payment failed, update status to 'failed'
       order.paymentStatus = "failed";
       await order.save();
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Payment verification failed. Please try again.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Payment verification failed. Please try again.",
+      });
     }
   } catch (error) {
     console.error("Error during payment verification:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Internal server error during payment verification.",
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error during payment verification.",
+    });
   }
 };
 
