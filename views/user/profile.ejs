@@ -150,7 +150,7 @@
                 </div>
                 <div class="col-md-5 d-flex align-items-center justify-content-end">
                   <div class="profile-actions">
-                    <button class="btn btn-light" onclick='openAddressModal("edit", "<%= JSON.stringify(address) %>")'>
+                    <button class="btn btn-light" onclick='openAddressModal("edit", <%= JSON.stringify(address) %>)'>
                       <i class="bx bx-edit"></i> Edit
                     </button>
                     <form id="deleteAddressForm_<%= address._id %>"
@@ -171,6 +171,7 @@
                 <P>No address found</P>
                 <% } %>
       </div>
+    </div>
     </div>
 
     <!-- Modal for Image Cropping -->

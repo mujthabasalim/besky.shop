@@ -18,7 +18,7 @@
 
               <a href="/product/<%= product._id %>/0" class="text-decoration-none text-dark"> <!-- Link to the first variant -->
                 <% if (firstVariant && firstVariant.images.length > 0) { %>
-                  <img src="<%= firstVariant.images[0] %>" class="product-img card-img-top" alt="<%= product.name %>">
+                  <img src="/public/uploads/<%= firstVariant.images[0] %>" class="product-img card-img-top" alt="<%= product.name %>">
                 <% } %>
                 <div class="card-body">
                   <p class="card-title mb-1"><strong><%= product.brand %></strong></p>
@@ -42,6 +42,7 @@
       <p>Your wishlist is empty.</p>
     <% } %>
   </div>
+</div>
 </div>
 
 <script>

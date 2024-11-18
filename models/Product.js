@@ -29,7 +29,7 @@ const ProductSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-ProductSchema.index({ name: 1, parentCategory: 1, subCategory: 1 }, { unique: true });
+// ProductSchema.index({ name: 1, parentCategory: 1, subCategory: 1 }, { unique: true });
 
 // Virtual field to populate reviews
 ProductSchema.virtual('reviews', {

@@ -5,6 +5,14 @@
     <h2>Category Management</h2>
   </div>
 
+  <!-- Flash Messages -->
+  <% if (successMessage && successMessage.length > 0) { %>
+    <div class="alert alert-success" id="success-message"><%= successMessage %></div>
+  <% } %>
+  <% if (errorMessage && errorMessage.length > 0) { %>
+    <div class="alert alert-danger" id="error-message"><%= errorMessage %></div>
+  <% } %>
+
   <div class="card shadow-sm p-4">
     <div class="d-flex justify-content-between mb-3 position-relative">
       <button type="button" class="btn btn-dark" id="addCategoryBtn" data-bs-toggle="modal" data-bs-target="#categoryModal">
@@ -81,6 +89,11 @@
             <label for="parentCategory" class="form-label">Parent Category</label>
             <select class="form-select" id="parentCategory" name="parentCategory">
               <option value="">None (Root Category)</option>
+              <% categories.forEach(category => { %>
+                <% if (category.parentCategory === null) { %>
+                  <option value="category._id"><%= category.name %></option>
+                <% } %>
+                <% }) %>
             </select>
           </div>
 
@@ -115,20 +128,20 @@
     const addCategoryBtn = document.getElementById("addCategoryBtn");
     const editCategoryBtns = document.querySelectorAll(".edit-category-btn");
 
-    function fetchParentCategories() {
-      fetch('/admin/fetch-parent-categories') 
-        .then(response => response.json())
-        .then(data => {
-          parentCategoryField.innerHTML = '<option value="">None (Root Category)</option>';
-          data.categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category._id;
-            option.textContent = category.name;
-            parentCategoryField.appendChild(option);
-          });
-        })
-        .catch(error => console.error('Error fetching parent categories:', error));
-    }
+    // function fetchParentCategories() {
+    //   fetch('/admin/fetch-parent-categories') 
+    //     .then(response => response.json())
+    //     .then(data => {
+    //       parentCategoryField.innerHTML = '<option value="">None (Root Category)</option>';
+    //       data.categories.forEach(category => {
+    //         const option = document.createElement('option');
+    //         option.value = category._id;
+    //         option.textContent = category.name;
+    //         parentCategoryField.appendChild(option);
+    //       });
+    //     })
+    //     .catch(error => console.error('Error fetching parent categories:', error));
+    // }
 
     addCategoryBtn.addEventListener("click", function () {
       categoryForm.action = "/admin/add-category";
@@ -136,7 +149,7 @@
       categoryIdField.value = "";
       categoryNameField.value = "";
       categoryStatusField.value = "true";
-      fetchParentCategories();
+      // fetchParentCategories();
       categoryModal.show();
     });
 
@@ -154,10 +167,10 @@
         categoryNameField.value = categoryName;
         categoryStatusField.value = categoryStatus === 'Active' ? 'true' : 'false';
 
-        fetchParentCategories();
-        setTimeout(() => {
-          parentCategoryField.value = parentCategoryId;
-        }, 500);
+        // fetchParentCategories();
+        // setTimeout(() => {
+        //   parentCategoryField.value = parentCategoryId;
+        // }, 500);
 
         categoryModal.show();
       });

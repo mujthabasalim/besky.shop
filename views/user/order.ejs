@@ -47,10 +47,10 @@
             <div class="row">
               <div class="col-md-7">
                 <div class="d-flex align-items-center">
-                  <img src="<%= order.items[0].image %>" alt="<%= order.items[0].name %>" class="product-image me-3">
+                  <img src="/public/uploads/<%= order.items[0].image %>" alt="<%= order.items[0].name %>" class="product-image me-3">
                   <div class="order-item-details">
                     <p class="m-0">
-                      <%= order._id %>
+                      <%= order.orderId.toUpperCase() %>
                     </p>
                     <p class="m-0 text-black-50" style="font-size: 14px;">
                       Number of ordered items: <%= order.items.length %> 
@@ -70,7 +70,7 @@
                     <a href="/protected/orders?order=<%= order._id %>" class="btn btn-dark w-100">View Order</a>
                     <% if (order.orderStatus === 'delivered') { %>
                       <button type="button" class="btn btn-outline-dark w-100" onclick="openModal('return', '<%= order._id %>')">Return</button>
-                    <% } else if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'returned' ) { %>
+                    <% } else if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'returned' && order.orderStatus !== 'pending_approval') { %>
                       <button type="button" class="btn btn-outline-dark w-100" onclick="openModal('cancel', '<%= order._id %>')">Cancel</button>
                     <% } else if (order.orderStatus === 'cancelled' || order.orderStatus === 'returned') { %>
                       <a href="/shop" type="button" class="btn btn-outline-dark w-100">Shop More</a>
@@ -78,12 +78,13 @@
                   </div>
                 </div>
               </div>
-              <div class="d-none d-md-block order-status <%= order.orderStatus.toLowerCase() %>"></div>
+              <div class="d-none d-md-block order-status mt-2 <%= order.orderStatus.toLowerCase() %>"></div>
             </div>
           </div>
       </div>
     <% }) %>
   </div>
+</div>
 </div>
 
 <!-- Modal Template for Cancel/Return -->
@@ -189,9 +190,11 @@ document.addEventListener("DOMContentLoaded", function() {
     } else if (element.classList.contains("delivered")) {
       element.innerHTML = '<span class="delivered-text">Delivered:</span> Your order has been delivered';
     } else if (element.classList.contains("cancelled")) {
-      element.innerHTML = '<span class="cancelled-text">Cancelled:</span> Your order order was canceled';
+      element.innerHTML = '<span class="cancelled-text">Cancelled:</span> Your order was canceled';
     } else if (element.classList.contains("returned")) {
-      element.innerHTML = '<span class="returned-text">Returned:</span> Your order order was returned';
+      element.innerHTML = '<span class="returned-text">Returned:</span> Your order was returned';
+    } else if (element.classList.contains("pending_approval")) {
+      element.innerHTML = '<span class="pending-text">Return requested:</span> You requested to return the your order';
     }
   });
 });

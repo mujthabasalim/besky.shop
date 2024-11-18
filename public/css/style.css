@@ -138,3 +138,13 @@ table {
   display: block;
   overflow-x: auto;
 }
+.alert-success {
+  border-left: var(--8px) solid #14A44D;
+  padding: var(--12px);
+  font-size: var(--12px);
+}
+.alert-danger {
+  border-left: var(--8px) solid #DC3545;
+  padding: var(--12px);
+  font-size: var(--14px);
+}

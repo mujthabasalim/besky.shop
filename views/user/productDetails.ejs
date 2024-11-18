@@ -224,7 +224,7 @@
               <% variant.images.forEach((image, index)=> { %>
                 <div class="thumbnail-wrapper col-3 col-lg-12 mb-2">
                   <img src="/public/uploads/<%= image %>" alt="Thumbnail <%= index + 1 %>" class="thumbnail-img img-fluid"
-                    style="cursor: pointer;" onclick="updateMainImage('<%= encodeURIComponent(image) %>')">
+                    style="cursor: pointer;" onclick="updateMainImage('/public/uploads/<%= encodeURIComponent(image) %>')">
                 </div>
                 <% }) %>
             </div>

@@ -15,7 +15,8 @@
       }
 
       /* Pending Status - Yellow */
-      .pending-text {
+      .pending-text,
+      .pending_approval {
         width: max-content;
         border-radius: 2px;
         padding: 0 4px;
@@ -51,9 +52,9 @@
             <div class="card border-0 rounded p-3">
               <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                <strong>Estimated delivery:--,--,-- </strong>
-                  <p class="m-0 ms-3 order-status <%= order.orderStatus.toLowerCase() %>">
-                    Order Status: <%= order.orderStatus.toUpperCase() %>
+                <!-- <strong>Estimated delivery:--,--,-- </strong> -->
+                  <p class="m-0 order-status <%= order.orderStatus.toLowerCase() %>">
+                    <%= order.orderStatus.toUpperCase() %>
                   </p>
                 </div>
                 <button class="btn btn-outline-danger <%= (order.orderStatus === 'delivered' || order.orderStatus === 'returned') ? 'd-block' : 'd-none' %>" id="invoiceBtn" data-order-id="<%= order._id %>" style="width: max-content;">
@@ -64,7 +65,7 @@
               </button>              
               </div>
               <!-- Shipping Address Section -->
-              <p>Order ID: <%= order._id.toString().toUpperCase() %>
+              <p>Order ID: <%= order.orderId.toUpperCase() %>
               </p>
               <p>Payment Method: <%= order.paymentMethod.toUpperCase() %>
               </p>
@@ -120,7 +121,7 @@
         <% order.items.forEach((item, index)=> { %>
           <div class="d-flex flex-column flex-md-row align-items-center justify-content-between py-3 border-bottom">
             <div class="d-flex align-self-start">
-              <img src="<%= item.image %>" alt="<%= item.name %>" class="product-image me-3">
+              <img src="/public/uploads/<%= item.image %>" alt="<%= item.name %>" class="product-image me-3">
               <div>
                 <p class="m-0" style="text-wrap: nowrap;">
                   <%= item.name %>
@@ -133,10 +134,11 @@
                 </p>
               </div>
             </div>
-            <button type="button" class="btn btn-dark align-self-end align-self-md-centre">Add Review</button>
+            <!-- <button type="button" class="btn btn-dark align-self-end align-self-md-centre">Add Review</button> -->
           </div>
           <% }) %>
       </div>
+    </div>
     </div>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>

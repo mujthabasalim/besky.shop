@@ -228,11 +228,13 @@ label {
 /* Sidebar lg styles */
 .sidebar {
   background: #fff;
-  position: fixed;
+  margin-left: var(--40px);
+  /* position: fixed;
   top: 6rem;
-  left: 3.125rem;
+  left: 3.125rem; */
   border: 1px solid #ddd;
-  max-width: 250px; /* Corrected to lowercase 'px' */
+  max-width: 250px;
+  height: max-content;
 }
 .sidebar .admin-welcome {
   border-bottom: solid 1px #ddd;
@@ -257,9 +259,10 @@ label {
 
 
 .content {
-  margin-left: 300px;
+  flex-grow: 1;
+  /* margin-left: 300px;
   margin-top: 4px;
-  padding: 20px;
+  padding: 20px; */
 }
 
 @media (max-width: 991.98px) {

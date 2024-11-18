@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 const Schema = mongoose.Schema;
 
 // Order Item Schema
@@ -39,6 +40,12 @@ const addressSchema = new Schema({
 
 // Main Order Schema
 const OrderSchema = new Schema({
+  orderId: {
+    type: String,
+    unique: true,
+    required: true,
+    default: () => uuidv4(),
+  },
   userId: { 
     type: Schema.Types.ObjectId, 
     ref: 'User', 
@@ -66,7 +73,7 @@ const OrderSchema = new Schema({
   grandTotal: { type: Number, required: true },
   orderStatus: { 
     type: String, 
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned', 'pending_approval'], 
+    enum: ['pending', 'shipped', 'delivered', 'cancelled', 'returned', 'pending_approval'], 
     default: 'pending' 
   },
   approvalStatus: {
@@ -84,6 +91,13 @@ const OrderSchema = new Schema({
 OrderSchema.index({ createdAt: 1 });
 OrderSchema.index({ userId: 1 });
 OrderSchema.index({ couponId: 1 });
+
+OrderSchema.pre('save', async function (next) {
+  if (!this.customOrderId) {
+    this.customOrderId = uuidv4();
+  }
+  next();
+});
 
 // Create Order model
 const Order = mongoose.model('Order', OrderSchema);

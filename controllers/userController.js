@@ -1122,7 +1122,6 @@ exports.updateOrderStatus = async (req, res) => {
   const { orderId, reason } = req.body;
 
   try {
-    // Fetch order and check if it exists
     const order = await Order.findById(orderId);
     if (!order) {
       return res
@@ -1130,10 +1129,7 @@ exports.updateOrderStatus = async (req, res) => {
         .json({ success: false, message: "Order not found" });
     }
 
-    // Get the user who placed the order
     const userId = order.userId;
-
-    // Initialize notification details
     let notificationTitle = "";
     let notificationType = "";
     let message = "";
@@ -1147,7 +1143,6 @@ exports.updateOrderStatus = async (req, res) => {
         notificationType = "Order Cancelled";
         message = `The order ${orderId} has been cancelled. Reason: ${reason}.`;
 
-        // Loop through each item in the order to restock
         for (const item of order.items) {
           const product = await Product.findById(item.productId);
           if (!product) continue;
@@ -1156,17 +1151,19 @@ exports.updateOrderStatus = async (req, res) => {
           if (!variant) continue;
 
           const sizeObj = variant.sizes.find((s) => s.size === item.size);
-          if (sizeObj) sizeObj.stock += item.quantity; // Restock the item
+          if (sizeObj) sizeObj.stock += item.quantity;
 
-          await product.save(); // Save updated product stock
+          await product.save();
         }
 
-        // Refund the entire amount paid by the customer
-        await WalletService.creditWallet(
-          order.userId,
-          order.grandTotal,
-          "Full refund for cancelled order"
-        );
+        if (order.paymentMethod === 'cod' && order.paymentStatus === 'paid' || order.paymentMethod !== 'cod') {
+          await WalletService.creditWallet(
+            order.userId,
+            order.grandTotal,
+            "Full refund for cancelled order"
+          );
+        }
+
         break;
 
       case "return":
@@ -1185,11 +1182,9 @@ exports.updateOrderStatus = async (req, res) => {
           .json({ success: false, message: "Invalid action" });
     }
 
-    // Save updated order
     order.updatedAt = Date.now();
     await order.save();
 
-    // Create notifications for both admin and user
     await createNotification({
       title: notificationTitle,
       message,
@@ -1209,7 +1204,6 @@ exports.updateOrderStatus = async (req, res) => {
       userId: userId,
     });
 
-    // Return response based on the action
     const successMessage =
       action === "cancel"
         ? "Order cancelled successfully, and a full refund has been issued."

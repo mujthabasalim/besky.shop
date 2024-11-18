@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="/public/css/user.css">
 
-
+<div class="d-flex justify-content-between mt-5">
 <div class="sidebar shadow-sm d-none d-lg-block pt-3">
   <div class="d-flex gap-2 pb-3 ps-4 admin-welcome">
     <img src="<%= user.profilePicture ? `/public/uploads/${user.profilePicture}` : 'https://www.gravatar.com/avatar/?d=mp' %>" class="rounded-circle profile-image" alt="User profile picture">
@@ -17,8 +17,8 @@
   <!-- <a id="cards-link" href="/protected/saved-cards"><i class='bx bx-credit-card'></i> Saved Cards</a> -->
   <a id="wallet-link" href="/protected/wallet"><i class='bx bx-wallet'></i> Wallet</a>
   <a id="coupons-link" href="/protected/coupons"><i class='bx bx-gift'></i> Coupons</a>
-  <a id="notifications-link" href="/notifications"><i class='bx bx-bell'></i> Notification</a>
-  <a id="settings-link" href="/settings"><i class='bx bx-cog'></i> Settings</a>
+  <!-- <a id="notifications-link" href="/notifications"><i class='bx bx-bell'></i> Notification</a>
+  <a id="settings-link" href="/settings"><i class='bx bx-cog'></i> Settings</a> -->
 </div>
 
 <script>

@@ -110,7 +110,7 @@
             <p class="phone m-1"><%= address.contactNo %></p>
           </div>
           <div class="profile-actions d-flex align-items-center justify-content-end gap-3">
-            <button class="btn btn-light" style="background-color: #eee;" onclick='openAddressModal("edit", "<%= JSON.stringify(address) %>")'>
+            <button class="btn btn-light" style="background-color: #eee;" onclick='openAddressModal("edit", <%= JSON.stringify(address) %>)'>
               <i class="bx bx-edit"></i> Edit
             </button>
             <form id="deleteAddressForm_<%= address._id %>" action="/protected/delete-address/<%= address._id %>" method="POST">

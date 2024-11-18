@@ -313,7 +313,7 @@ exports.updateUserStatus = async (req, res) => {
 exports.getAllCategories = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 10;
+    const limit = 2;
 
     const sort = req.query.sort || "-createdAt";
     const search = req.query.search || "";
@@ -392,8 +392,19 @@ exports.saveCategory = async (req, res) => {
     if (categoryId) {
       await Category.findByIdAndUpdate(categoryId, categoryData, { new: true });
     } else {
+      const existingCategory = await Category.findOne({name: name});
+      if (existingCategory && parentCategory === '') {
+        req.flash('error', 'The parent Category already found.');
+        return res.redirect('/admin/categories');
+      } else if(existingCategory && parentCategory !== '') {
+        req.flash('error', 'The Category already found within the same parent category.');
+        return res.redirect('/admin/categories');
+      }
       await new Category(categoryData).save();
+      req.flash('success', 'Category updated successfully.');
+      return res.redirect('/admin/categories');
     }
+    req.flash('success', 'Category added successfully.');
     return res.redirect("/admin/categories");
   } catch (error) {
     return handleError(res, error, "Failed to save category");
@@ -558,11 +569,9 @@ exports.saveProduct = async (req, res) => {
   } = req.body;
 
   try {
-    // Handle file uploads
     const files = req.files || [];
-
-    // Map files to variants
     const variantFilesMap = {};
+
     files.forEach((file) => {
       const match = file.fieldname.match(
         /variants\[(\d+)\]\[newImages\]\[(\d+)\]/
@@ -573,62 +582,62 @@ exports.saveProduct = async (req, res) => {
         if (!variantFilesMap[variantIndex]) {
           variantFilesMap[variantIndex] = [];
         }
-        const path = file.filename;
-        variantFilesMap[variantIndex].push({ imageIndex, path });
+        variantFilesMap[variantIndex].push({ imageIndex, path: file.filename });
       }
     });
 
     let existingProduct = null;
     if (productId) {
-      // Fetch the existing product for updates
       existingProduct = await Product.findById(productId);
       if (!existingProduct) {
-        return res.status(404).send("Product not found.");
+        req.flash('error', 'Product not found');
+        return res.redirect('/admin/products');
       }
     }
 
-    // Handle variants
-    const variantsData = variants.map((v, index) => {
+    let validationError = false;
+    const validatedVariants = [];
+    variants.forEach((v, index) => {
       const {
         _id,
         color,
         sizes: sizesString,
         stocks: stocksString,
-        isActive,
+        isActive: variantActive,
         existingImages = [],
       } = v;
-      let images = [...existingImages];
 
-      // Convert sizes and stock from comma-separated strings to arrays
       const sizes = sizesString.split(",").map((sz) => sz.trim());
-      const stocks = stocksString
-        .split(",")
-        .map((st) => parseInt(st.trim(), 10));
+      const stocks = stocksString.split(",").map((st) => parseInt(st.trim(), 10));
 
       if (sizes.length !== stocks.length) {
-        throw new Error(
-          `Sizes and stock counts do not match for variant ${index}`
+        req.flash(
+          'error',
+          `Sizes and stock counts do not match for variant ${index + 1} of ${name}`
         );
+        validationError = true;
+        return;
       }
 
-      // Replace specific images if new ones are uploaded
+      let images = [...existingImages];
       if (variantFilesMap[index] && variantFilesMap[index].length > 0) {
         variantFilesMap[index].forEach(({ imageIndex, path }) => {
           images[imageIndex] = path;
         });
       }
 
-      // Create the variant object, preserving the _id if it exists
-      const variant = {
-        _id, // This keeps the old _id if it's available, preventing MongoDB from generating a new one
+      validatedVariants.push({
+        _id,
         color,
         sizes: sizes.map((size, idx) => ({ size, stock: stocks[idx] })),
         images,
-        isActive: isActive === "on",
-      };
-
-      return variant;
+        isActive: variantActive === "on",
+      });
     });
+
+    if (validationError) {
+      return res.redirect('/admin/products');
+    }
 
     const productData = {
       name,
@@ -640,54 +649,36 @@ exports.saveProduct = async (req, res) => {
         ? attributes.split(",").map((tag) => tag.trim())
         : [],
       description,
-      variants: variantsData,
+      variants: validatedVariants,
       isActive: isActive === "on",
     };
 
     if (productId) {
-      // For updating existing product
-      existingProduct.variants.forEach((existingVariant) => {
-        // Find corresponding variant from the request
-        const updatedVariant = variantsData.find(
-          (v) => v._id && v._id.toString() === existingVariant._id.toString()
+      // Update existing product
+      validatedVariants.forEach((newVariant) => {
+        const existingVariant = existingProduct.variants.find(
+          (v) => v._id && v._id.toString() === newVariant._id?.toString()
         );
-
-        // Update the existing variant with new data if found
-        if (updatedVariant) {
-          Object.assign(existingVariant, updatedVariant);
-        }
-      });
-
-      // Push new variants (those without _id)
-      variantsData.forEach((newVariant) => {
-        if (!newVariant._id) {
+        if (existingVariant) {
+          Object.assign(existingVariant, newVariant);
+        } else {
           existingProduct.variants.push(newVariant);
         }
       });
 
-      // Update basic product data
-      existingProduct.name = name;
-      existingProduct.brand = brand;
-      existingProduct.parentCategory = parentCategory;
-      existingProduct.subCategory = subCategory;
-      existingProduct.price = price;
-      existingProduct.attributes = attributes
-        ? attributes.split(",").map((tag) => tag.trim())
-        : [];
-      existingProduct.description = description;
-      existingProduct.isActive = isActive === "on";
-
-      // Save the updated product
+      Object.assign(existingProduct, productData);
       await existingProduct.save();
     } else {
-      // For creating a new product
       await new Product(productData).save();
     }
 
-    res.redirect("/admin/products");
+    res.redirect('/admin/products');
   } catch (error) {
     console.error(error);
-    res.status(500).send("An error occurred while saving the product.");
+    if (!res.headersSent) {
+      req.flash('error', 'An error occurred while saving the product.');
+      res.redirect('/admin/products');
+    }
   }
 };
 
@@ -734,12 +725,15 @@ exports.getAllOrders = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
+    const orderId = req.query.orderId;
 
     const sort = req.query.sort || "-createdAt";
     const search = req.query.search || "";
     const filters = {};
 
     const query = {};
+
+    if (orderId) query._id = orderId;
 
     if (search) {
       query.$or = [{ items: { $regex: search, $options: "i" } }];
@@ -782,7 +776,6 @@ exports.getAllOrders = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
-    console.log(orderId);
 
     const order = await Order.findById(orderId);
     if (!order) {
