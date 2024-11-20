@@ -376,8 +376,15 @@ exports.resetPassword = async (req, res) => {
 // Handle logout
 exports.logout = (req, res) => {
   try {
-    res.clearCookie("token");
-    res.redirect("/");
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Error destroying session:", err);
+        return res.status(500).send("Could not log out, please try again.");
+      }
+      res.clearCookie("token");
+      res.clearCookie("connect.sid");
+      res.redirect("/");
+    });
   } catch (error) {
     console.error(error);
   }

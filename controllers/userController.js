@@ -1312,6 +1312,10 @@ exports.manageWishlist = async (req, res) => {
   const userId = req.user.id;
 
   try {
+    if (!userId) {
+      return res.status(400).json({ success: false , message: "Please login"});
+    }
+    
     let wishlist = await Wishlist.findOne({ userId });
 
     // Create wishlist if it doesn't exist

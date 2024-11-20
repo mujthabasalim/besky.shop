@@ -288,7 +288,6 @@
         const productList = document.getElementById('productsContainer');
         productList.innerHTML = '';
 
-        const token = "<%= token %>";
 
         products.forEach(product => {
           const isInWishlist = wishlist && wishlist.includes(product._id.toString());
@@ -330,10 +329,9 @@
       const initializeWishlistButtons = () => {
         document.querySelectorAll('.btn-wishlist').forEach(heartIcon => {
           heartIcon.addEventListener('click', async function () {
-            const token = "<%= token %>";
+            
             if (!token) {
-              window.location.href = "/auth/login";
-              return;
+              return createToast("Please login to add to wishlist", 'error')
             }
 
             const productId = this.dataset.productId;
